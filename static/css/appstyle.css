@@ -179,3 +179,14 @@ a.disabled {
   50% { transform: scale(0.9); }
   100% { transform: scale(1); }
 }
+
+/* for sticky footer */
+html,
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+body > footer {
+    margin-top: auto;
+}
