@@ -1,0 +1,25 @@
+{% extends '../base.html' %} 
+{% block header %} 
+{% endblock header %}
+{% block content %}
+<h2 class="title has-text-centered">予約確認</h2>
+<p class="has-text-centered">下記の内容で予約します。</p>
+
+{% include '../common/form_confirm.html' %}
+
+<form action="{% url 'reserve_create' %}" method="POST">
+    {% csrf_token %}
+    {% for field in form %}
+        {{field.as_hidden}}
+    {% endfor %}
+    <div class="field is-grouped is-grouped-right">
+        <p class="control">
+            <input class="button is-info" type="submit" value="確定">
+        </p>
+        <p class="control">
+            <a class="button is-danger" href="/reserve/{{ form.start_date.value }}/{{ form.number.value }}">キャンセル</a>
+        </p>
+    </div>
+</form>
+
+{% endblock content %}

@@ -1,0 +1,325 @@
+{% extends '../base.html' %} {% block header %} {% endblock header %}
+{% block content %}
+<h2 class="title has-text-centered">予約入力</h2>
+
+{% include '../common/form_error.html' %}
+
+<form action="" method="POST" onSubmit="return saveInfo()">
+  {% csrf_token %} 
+  {% load widget_tweaks %}
+
+  <div class="field">
+    {{ form.number.label_tag }} {{ form.number | add_class:'input' }} 
+    {% if form.number.help_text %}
+    <span class="helptext">{{ form.number.help_text }}</span>
+    {% endif %} {% if form.number.error %}
+    <p class="help is-danger">{{ form.number.errors }}</p>
+    {% endif %}
+  </div>
+
+  <div class="field">
+    {{ form.start_date.label_tag }} {{ form.start_date | add_class:'input' }} 
+    {% if form.start_date.help_text %}
+    <span class="helptext">{{ form.start_date.help_text }}</span>
+    {% endif %} {% if form.start_date.error %}
+    <p class="help is-danger">{{ form.start_date.errors }}</p>
+    {% endif %}
+  </div>
+
+  {% comment %}
+  <div class="field">
+    {{ form.selected_time.label_tag }} {{ form.selected_time }} {% if
+    form.selected_time.error %}
+    <p class="help is-danger">{{ form.selected_time.errors }}</p>
+    {% endif %}
+  </div>
+  {% endcomment %}
+
+  <div class="field">
+    {{ form.selected_time.label_tag }}
+    <p class="has-text-danger">※スマホ等の場合、横にスクロールできます。</p>
+    <div class="switch-field">
+      {% for choice in form.selected_time %} 
+      {{ choice.tag }}
+      <label class="radio" for="{{ choice.id_for_label }}">
+        {{ choice.choice_label | linebreaksbr }}
+      </label>
+      {% endfor %}
+      {% if form.selected_time.error %}
+      <p class="help is-danger">{{ form.selected_time.errors }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+
+  {% comment %} <div class="field">
+    {{ form.selected_seat.label_tag }}
+      {% for choice in form.selected_seat %} 
+      {{ choice.tag }}
+      <label for="{{ choice.id_for_label }}">
+        {{ choice.choice_label | linebreaksbr }}
+      </label>
+      {% endfor %} 
+      {% if form.selected_time.error %}
+      <p class="help is-danger">{{ form.selected_seat.errors }}</p>
+      {% endif %}
+  </div> {% endcomment %}
+
+  <p>{{ form.selected_seat.label }}:</p>
+  <p id="selected_set_error" class="has-text-danger"></p>
+  <div class="checkboxes-and-radios">
+      {% for choice in form.selected_seat %} 
+      {{ choice.tag }}
+      <label for="{{ choice.id_for_label }}">
+        {{ choice.choice_label }}</br>
+        <p id="exp_{{ choice.id_for_label }}"></p>
+      </label>
+      {% endfor %} 
+      {% if form.selected_time.error %}
+      <p class="help is-danger">{{ form.selected_seat.errors }}</p>
+      {% endif %}
+  </div>
+
+  <div class="field">
+    {{ form.full_name.label_tag }} {{ form.full_name | add_class:'input' }} 
+    {% if form.full_name.help_text %}
+    <span class="help is-link">{{ form.full_name.help_text }}</span>
+    {% endif %} 
+    {% if form.full_name.error %}
+    <p class="help is-danger">{{ form.full_name.errors }}</p>
+    {% endif %}
+  </div>
+
+  <div class="field">
+    {{ form.tel.label_tag }} {{ form.tel | add_class:'input' }}
+     {% if form.tel.help_text %}
+    <span class="helptext">{{ form.tel.help_text }}</span>
+    {% endif %} {% if form.tel.error %}
+    <p class="help is-danger">{{ form.tel.errors }}</p>
+    {% endif %}
+  </div>
+
+  <div class="field">
+    {{ form.email.label_tag }} {{ form.email | add_class:'input' }}
+     {% if form.email.help_text %}
+    <span class="helptext">{{ form.email.help_text }}</span>
+    {% endif %} {% if form.email.error %}
+    <p class="help is-danger">{{ form.email.errors }}</p>
+    {% endif %}
+  </div>
+
+  <div class="field">
+    {{ form.memo.label_tag }} {{ form.memo | add_class:'input' }} 
+    {% if form.memo.help_text %}
+    <span class="help is-link">{{ form.memo.help_text }}</span>
+    {% endif %} {% if form.memo.error %}
+    <p class="help is-danger">{{ form.memo.errors }}</p>
+    {% endif %}
+  </div>
+
+  <div class="field is-grouped is-grouped-right">
+    <p class="control">
+      <input class="button is-info" type="submit" value="確定" />
+    </p>
+    <p class="control">
+      <a class="button is-danger" href="{% url 'my_page' %}">キャンセル</a>
+    </p>
+  </div>
+</form>
+
+<script>
+  let seatJson = {{seat_json | safe}}
+  let seatInfoJson = {{seat_info_json | safe}}
+
+  function inputChange(obj) {
+    let number = document.getElementById("id_number").value;
+    let date = document.getElementById("id_start_date").value;
+    if (number && date) {
+      saveInfo();
+      location.href = "/reserve/" + date + "/" + number;
+    }
+  }
+
+  function saveInfo() {
+    console.log("save info");
+    let name = document.getElementById("id_full_name").value;
+    let tel = document.getElementById("id_tel").value;
+    let memo = document.getElementById("id_memo").value;
+    localStorage.setItem("name", name);
+    localStorage.setItem("tel", tel);
+    localStorage.setItem("memo", memo);
+    return true;
+  }
+
+  function loadInfo() {
+    let nameValue = localStorage.getItem("name");
+    let telValue = localStorage.getItem("tel");
+    let memoValue = localStorage.getItem("memo");
+    let form_name = document.getElementById("id_full_name");
+    let form_tel = document.getElementById("id_tel");
+    let form_memo = document.getElementById("id_memo");
+
+    // only when empoty value case, set stored value
+    if (nameValue && form_name && !form_name.value) {
+      form_name.value = nameValue;
+    } 
+    if (telValue && form_tel && !form_tel.value) {
+      form_tel.value = telValue;
+    } 
+    if (memoValue && form_memo && !form_memo.value) {
+      form_memo.value = memoValue;
+    }
+  }
+
+  let currentSelectedTime = null;
+
+  function initRadioEvent() {
+    manupilate_SeatRadio();
+    const elements = document.getElementsByName("selected_time");
+      elements.forEach(function (e) {
+        e.addEventListener("click", function () {
+          const value = document.querySelector("input:checked[name=selected_time]").value
+          if (currentSelectedTime === value) {
+              return;
+          }
+          // init selection of seat
+          currentSelectedTime = value
+          manupilate_SeatRadio()
+          clearSeatSelection()
+          setSeatRadioEnabledState()
+          // alert(value)
+        });
+      });
+  }
+
+  function manupilate_SeatRadio() {
+      if (!currentSelectedTime) {
+        setSeatRadioState(true)
+      } else {
+        setSeatRadioState(false)
+      }
+  }
+
+  function clearSeatSelection() {
+      const elements = document.getElementsByName("selected_seat");
+      for (let ele of elements) {
+          ele.checked = null
+      }
+  }
+
+  function setSeatRadioEnabledState() {
+      const time = currentSelectedTime.slice(0,5);
+      if(seatJson[time].seat_status) {
+        const seatsState = seatJson[time].seat_status;
+        const elements = document.getElementsByName("selected_seat");
+        for (let ele of elements) {
+            // get seat pk from value
+            // const num = ele.value.split('(')[1].split(')')[0];
+            const num = ele.value;
+            // set radio state
+            if (seatsState[num]) {
+                setState(ele, false);
+            } else {
+                setState(ele, true);             
+            }
+        }
+      } else {
+          // set all radio none
+          alert("指定時刻に予約可能な座席がございません。");
+          setSeatRadioState(true)
+      }
+  }
+
+  function setSeatRadioState(disabled) {
+    const elements = document.getElementsByName("selected_seat");
+    for (let ele of elements) {
+      setState(ele, disabled);
+    }
+  }
+
+  function setState(ele, disabled) {
+      ele.disabled = disabled;
+      // get child label
+      const label = document.querySelector(`label[for="${ele.id}"]`);
+      if (disabled) {
+        ele.style.display ="none";
+        label.style.display ="none";
+        // ele.style.opacity ="0";
+        // label.style.opacity ="0";
+      } else {
+        ele.style.display ="";
+        label.style.display ="";
+        // ele.style.opacity ="100";
+        // label.style.opacity ="100";
+      }
+  }
+
+  function initSelectionEvent() {
+    // set selection change event
+    let number_text = document.getElementById("id_number");
+    number_text.onchange = inputChange;
+    let date_text = document.getElementById("id_start_date");
+    date_text.onchange = inputChange;
+  }
+
+  function initSelectedTimeRadioState() {
+    for (let [key, value] of Object.entries(seatJson)) {
+      if (!value.can_reserve) {
+        // set disabled
+        setSelectedTimeRadioDisabled(key + ":00", true);
+      } else {
+        setSelectedTimeRadioDisabled(key + ":00", false);        
+      }
+    }
+  }
+
+  function initSeatMemo() {
+    if (seatInfoJson) {
+      const elements = document.getElementsByName("selected_seat");
+      for (ele of elements) {
+        // get elpnamation label area
+        const expElem = document.querySelector(`p[id="exp_${ele.id}"]`);
+        // get explnation
+        const memo = seatInfoJson[Number(ele.value)].memo;
+        if (expElem && memo) {
+          expElem.innerHTML = memo;
+        }
+      }
+    }
+  }
+
+  function setSelectedTimeRadioDisabled(time, disabled) {
+    const elements = document.getElementsByName("selected_time");
+    for (ele of elements) {
+      if (ele.value === time) {
+        ele.disabled = disabled;
+      }
+    }
+  }
+
+  function initValidationEvent() {
+    // select seat radio button validation
+    const elements = document.getElementsByName("selected_seat");
+    for (ele of elements) {
+      ele.addEventListener('invalid', function(e) {
+        const errorPlace = document.getElementById('selected_set_error');
+        errorPlace.innerHTML = "座席が未選択です。";
+      }, false);
+      ele.addEventListener('change', function(e) {
+        const errorPlace = document.getElementById('selected_set_error');
+        errorPlace.innerHTML = "";
+      }, false);      
+    }
+  }
+
+  window.onload = function () {
+    loadInfo();
+    initRadioEvent();
+    initSelectionEvent();
+    initSeatMemo();
+    initSelectedTimeRadioState();
+    initValidationEvent();
+  };
+</script>
+
+{% endblock content %}

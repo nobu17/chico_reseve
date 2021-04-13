@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block head_title %}{% trans "Sign In" %}{% endblock %}
+
+{% block content %}
+{% load widget_tweaks %}
+<h2 class="title has-text-centered">{% trans "Sign In" %}</h2>
+
+{% include '../common/form_error.html' %}
+
+{% if request.path == "/accounts/admin_login/" %}
+<!-- only for admin page -->
+  <form class="login" method="POST" action="{% url 'account_login' %}">
+    {% csrf_token %}
+    {% comment %} {{ form.as_p }} {% endcomment %}
+
+    <div class="field">
+        {{ form.login.label_tag }}
+        {{ form.login | add_class:'input' }}
+        {% if form.login.help_text %}
+            <span class="helptext">{{ form.login.help_text }}</span>
+        {% endif %}
+        {% if form.login.error %}
+            <p class="help is-danger">{{ form.login.errors }}</p>
+        {% endif %}
+    </div>
+    <div class="field">
+        {{ form.password.label_tag }}
+        {{ form.password | add_class:'input' }}
+        {% if form.password.help_text %}
+            <span class="helptext">{{ form.password.help_text }}</span>
+        {% endif %}
+        {% if form.password.error %}
+            <p class="help is-danger">{{ form.password.errors }}</p>
+        {% endif %}
+    </div>
+    <div class="field">
+        {{ form.remember | add_class:'is-checkradio is-medium is-danger' }}
+        {{ form.remember.label_tag }}
+        {% if form.remember.help_text %}
+            <span class="helptext">{{ form.remember.help_text }}</span>
+        {% endif %}
+        {% if form.remember.error %}
+            <p class="help is-danger">{{ form.remember.errors }}</p>
+        {% endif %}
+    </div>
+
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+
+    <div class="field is-grouped is-grouped-right">
+      <p class="control">
+        <button class="button is-info" type="submit">{% trans "Sign In" %}</button>
+      </p>
+    </div>
+  </form>
+{% else %}
+<!-- user login -->
+<p class="has-text-centered has-text-danger m-3">下記のいずれかのアカウントでログインをお願いします。</br>お持ちでない方はお手数ですが取得後再度ログインをお願いいたします。</p>
+{% get_providers as socialaccount_providers %}
+
+{% if socialaccount_providers %}
+
+<div class="socialaccount_ballot">
+
+  <ul class="socialaccount_providers">
+    {% comment %} {% include "socialaccount/snippets/provider_list.html" with process="login" %} {% endcomment %}
+    {% include "account/social.html" with process="login" %}
+  </ul>
+
+</div>
+
+{% include "socialaccount/snippets/login_extra.html" %}
+
+{% endif %}
+
+{% endif %}
+
+
+
+{% endblock %}

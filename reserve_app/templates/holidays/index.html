@@ -1,0 +1,38 @@
+{% extends '../base.html' %} {% block header %} {% endblock header %} 
+{% block content %}
+<h2 class="title has-text-centered">休日管理</h2>
+<p class="has-text-centered has-text-danger">※最大10件まで登録可能</p>
+<div class="table-container">
+<table class="table has-text-centered is-fullwidth">
+  <thead>
+    <tr>
+      <th><abbr title="memo">名称</abbr></th>
+      <th><abbr title="start">開始日</abbr></th>
+      <th><abbr title="end">終了日</abbr></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  {% for holiday in object_list %}
+  <tr>
+    <td>{{ holiday.memo }}</td>
+    <td class="wide-column">{{ holiday.start_date | date:"Y年m月d日" }}</td>
+    <td class="wide-column">{{ holiday.end_date | date:"Y年m月d日" }}</td>
+    <td><a class="button is-link" href="{% url 'holidays_update' holiday.pk %}">更新</a></td>
+    <td><a class="button is-danger" href="{% url 'holidays_delete' holiday.pk %}">削除</a></td>
+  </tr>
+  {% endfor %}
+</table>
+</div>
+
+<div class="columns">
+<div class="column is-6">
+  <a class="button is-info is-fullwidth" href="{% url 'holidays_create' %}">新規作成</a>
+</div>
+<div class="column is-6">
+  <a class="button is-danger is-fullwidth" href="{% url 'user_admin' %}">戻る</a>
+</div>
+</div>
+
+
+{% endblock content %}

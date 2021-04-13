@@ -1,0 +1,18 @@
+{% if user_message %}
+<div class="notification is-danger nootification_message">
+  <button class="delete"></button>
+  {{ user_message }}
+</div>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
+    const $notification = $delete.parentNode;
+
+    $delete.addEventListener('click', () => {
+      $notification.parentNode.removeChild($notification);
+    });
+  });
+});
+</script>

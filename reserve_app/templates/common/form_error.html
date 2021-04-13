@@ -1,0 +1,11 @@
+{% if form.errors %}
+<div class="errorlist content">
+  <ul>
+    {% for errors in form.errors.values %}
+     {% for error in errors %}
+     <li><p class="has-text-danger">{{ error}}</p></li>
+    {% endfor %} 
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}

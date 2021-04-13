@@ -1,0 +1,43 @@
+{% extends '../base.html' %} {% block header %} {% endblock header %} 
+{% block content %}
+<h2 class="title has-text-centered">ユーザー一覧</h2>
+<a class="button is-danger" href="{% url 'user_admin' %}">戻る</a>
+
+{% if object_list %}
+<div class="table-container">
+<table class="table has-text-centered is-fullwidth">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>ユーザ名</th>
+      <th>email(social)</th>
+      <th>email(入力)</th>
+      <th>フルネーム</th>
+      <th>電話番号</th>
+      <th>最終ログイン</th>
+      <th>アカウント作成日</th>
+    </tr>
+  </thead>
+  <tbody>
+      {% for user in object_list %}
+      <tr>
+        <td class="wide-column-small">{{ user.id }}</td>
+        <td class="wide-column">{{ user.username }}</td>
+        <td class="wide-column-medium">{{ user.email }}</td>
+        <td class="wide-column-medium">{{ user.second_email }}</td>   
+        <td class="wide-column-medium">{{ user.full_name }}</td>     
+        <td class="wide-column-small">{{ user.tel_number }}</td>
+        <td class="wide-column">{{ user.last_login }}</td>
+        <td class="wide-column">{{ user.date_joined }}</td>
+      </tr>
+      {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p>ユーザ情報はありません。</p>
+{% endif %}
+
+{% include '../common/page_nation.html' %}
+
+{% endblock content %}

@@ -1,0 +1,38 @@
+{% extends '../base.html' %} {% block header %} {% endblock header %} 
+{% block content %}
+<h2 class="title has-text-centered">座席設定</h2>
+
+<div class="table-container">
+<table class="table has-text-centered is-fullwidth">
+  <thead>
+    <tr>
+      <th>名称</th>
+      <th>説明</th>
+      <th>席数</th>
+      <th>収容人数</th>
+      <th>必要人数/予約</th>
+    　<th>使用可能数/予約</th>
+      <th></th>
+    </tr>
+  </thead>
+  {% for seat in object_list %}
+  <tr>
+    <td class="wide-column">{{ seat.name }}</td>  
+    <td class="wide-column">{{ seat.memo }}</td>
+    <td class="wide-column-small">{{ seat.count }}</td>
+    <td class="wide-column-small">{{ seat.capacity }}</td>
+    <td class="wide-column-small">{{ seat.minnum }}</td>
+    <td class="wide-column-small">{{ seat.max_count_of_one_reserve }}</td>
+    <td><a class="button is-danger" href="{% url 'seats_update' seat.pk %}">更新</a></td>    
+  </tr>
+  {% endfor %}
+</table>
+</div>
+
+<div class="column is-6">
+  <a class="button is-danger is-fullwidth" href="{% url 'user_admin' %}">戻る</a>
+</div>
+</div>
+
+
+{% endblock content %}

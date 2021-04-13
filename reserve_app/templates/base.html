@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja" class="has-navbar-fixed-top">
+  <head>
+    <meta charset="utf-8">
+    <title>予約サイト</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-calendar@6.0.0/dist/css/bulma-calendar.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-extensions@6.2.7/bulma-checkradio/dist/css/bulma-checkradio.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-social@2/css/all.min.css" />
+    <link rel="stylesheet" href="{% static 'css/smart.default.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/appstyle.css' %}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bulma-calendar@6.0.0/dist/js/bulma-calendar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bulma-extensions@6.2.7/dist/js/bulma-extensions.min.js"></script>
+    <script src="{% static 'js/smart.element.js' %}"></script>
+    <script src="{% static 'js/smart.calendar.js' %}"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // Get all "navbar-burger" elements
+        const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+        // Check if there are any navbar burgers
+        if ($navbarBurgers.length > 0) {
+          // Add a click event on each of them
+          $navbarBurgers.forEach( el => {
+            el.addEventListener('click', () => {
+            // Get the target from the "data-target" attribute
+            const target = el.dataset.target;
+            const $target = document.getElementById(target);
+            // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+            el.classList.toggle('is-active');
+            $target.classList.toggle('is-active');
+            });
+          });
+      }});
+    </script>
+  </head>
+  <body>
+  <!-- Navigation bar -->
+  <nav class="navbar is-link is-fixed-top">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="{% url 'index' %}">
+        CHICO★SPICE
+      </a>
+      <div class="navbar-burger burger" data-target="navbarExampleTransparentExample">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <div id="navbarExampleTransparentExample" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="{% url 'index' %}">
+          <span class="icon">
+            <i class="fas fa-home"></i>
+          </span>
+          <span>Home</span>
+        </a>
+        <a class="navbar-item" href="{% url 'my_page' %}">
+          <span class="icon">
+            <i class="far fa-user"></i>
+          </span>
+          <span>MyPage</span>
+        </a>
+        {% if user.is_authenticated and user.is_superuser %}
+        <a class="navbar-item" href="{% url 'user_admin' %}">
+          <span class="icon">
+            <i class="fas fa-user"></i>
+          </span>
+          <span>AdminPage</span>
+        </a>
+        {% endif %}
+        {% if user.is_authenticated %}
+        <a class="navbar-item" href="{% url 'account_logout' %}">
+          <span class="icon">
+            <i class="fas fa-lock-open"></i>
+          </span>
+          <span>Logout</span>
+        </a>
+        {% else %}
+        <a class="navbar-item" href="{% url 'account_login' %}">
+          <span class="icon">
+            <i class="fas fa-lock"></i>
+          </span>
+          <span>Login</span>
+        </a>
+        {% endif %}
+        <a class="navbar-item" href="{% url 'contact' %}">
+          <span class="icon">
+            <i class="fas fa-envelope"></i>
+          </span>
+          <span>Contact</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+  <div class="container">
+  </br>
+  <div class="mr-2 ml-2">
+    {% comment %} {% if user.is_authenticated %}
+      <p>Welconme: {{ user.username }}</p>
+      <a href="{% url 'account_logout' %}">Logout</a>
+      <p>isStaff: {{ user.is_staff }}</p>
+      <p>is_superuser: {{ user.is_superuser }}</p>
+    {% else %}
+      <a href="{% url 'account_login' %}">Login</a>
+    {% endif %} {% endcomment %}
+
+      {% include './common/message.html' %}
+      {% block header %} {% endblock header %} 
+      {% block content %} {% endblock content %}
+    </div>
+    </div>
+  </body>
+</html>

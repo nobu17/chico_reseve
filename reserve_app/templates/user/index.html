@@ -1,0 +1,82 @@
+{% extends '../base.html' %} {% block header %} {% endblock header %} 
+{% block content %}
+<h2 class="title has-text-centered">MyPage</h2>
+{% include '../common/user_message.html' %}
+
+<span class="icon-text">
+  <span class="icon">
+    <i class="far fa-lg fa-calendar-check has-text-info"></i>
+  </span>
+  <h3 class="subtitle has-text-left has-text-info">現在の予約</h3>
+</span>
+
+{% if reserves %}
+  {% for reserve in reserves %}
+  <article class="panel is-link mx-2 my-4">
+    <p class="panel-heading">
+      {{ reserve.start_date | date:"Y年m年d日 (l)" }}
+    </p>
+    <p class="panel-block">時刻： 
+    {{ reserve.start_time }}
+    </p>
+    <p class="panel-block">人数： 
+    {{ reserve.number }}
+    </p>
+    <p class="panel-block">座席： 
+    {{ reserve.seat.name }}
+    </p>
+    <p class="panel-block">
+      備考：
+      {{ reserve.memo }}
+    </p>
+    <p class="panel-block">
+      <a class="button is-danger is-fullwidth" href="{% url 'reserve_cancel' reserve.pk %}">キャンセルする</a>
+    </p>
+  </article>
+  {% endfor %}
+{% else %}
+<p class="m-4">現在、予約はありません。</p>
+{% endif %}
+<p class="m-4 text-has-success">※同時に予約可能な件数は１件になります。</p>
+</br>
+<aside class="menu">
+  <p class="menu-label has-text-info is-size-5">
+    <span class="icon has-text-info">
+      <i class="far fa-list-alt"></i>
+    </span>
+    マイメニュー
+  </p>
+  <ul class="menu-list">
+    <a href="{% url 'reserve' %}">
+      <span class="icon">
+        <i class="far fa-caret-right"></i>
+      </span>
+      予約する(TestMode)
+      </a>
+    {% if not reserves %}
+      <a href="{% url 'reserve' %}">
+      <span class="icon">
+        <i class="far fa-caret-right"></i>
+      </span>
+      予約する
+      </a>
+    {% else %}
+      <a class="disabled has-text-danger" href="{% url 'reserve' %}">
+      <span class="icon">
+        <i class="far fa-caret-right"></i>
+      </span>
+      予約する (※現在予約済のため利用不可。)
+      </a>
+    {% endif %}
+    <li>
+      <a href="{% url 'my_page_history' %}">
+        <span class="icon">
+          <i class="far fa-caret-right"></i>
+        </span>
+        予約履歴
+      </a>
+    </li>
+  </ul>
+</aside>
+
+{% endblock content %}

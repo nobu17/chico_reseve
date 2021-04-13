@@ -1,0 +1,118 @@
+{% extends '../base.html' %} {% block header %} {% endblock header %} 
+{% block content %}
+<div class="has-text-centered">
+  <h2 class="title">管理メニュー</h2>
+</div>
+
+{% include '../common/user_message.html' %}
+
+<section class="m-5">
+    <div class="tile is-ancestor has-text-centered">
+        <a class="tile is-parent" href="{% url 'admin_reserves_list' mode='specify_date' %}">
+            <article class="tile is-child box">
+                <p class="subtitle">本日の予約</p>
+                <p class="title">{{ today_reserve_count }}</p>
+            </article>
+        </a>
+        <a class="tile is-parent" href="{% url 'admin_reserves_list' mode='specify_date' param=tomorrow_date %}">
+            <article class="tile is-child box is-warning">
+                <p class="subtitle">明日の予約</p>
+                <p class="title">{{ tomorrow_reserve_count }}</p>
+            </article>
+        </a>
+    </div>
+</section>
+
+<aside class="menu">
+    <p class="menu-label has-text-info is-size-5">
+        <span class="icon has-text-info">
+        <i class="far fa-calendar-check"></i>
+        </span>
+        予約確認
+    </p>
+    <ul class="menu-list">
+        <li>
+            <a href="{% url 'admin_reserves_list' %}">
+            <span class="icon">
+                <i class="far fa-caret-right"></i>
+            </span>
+            予約確認(日付順)
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'admin_reserves_list' mode='created' %}">
+            <span class="icon">
+                <i class="far fa-caret-right"></i>
+            </span>
+            予約確認(申し込み順)
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'admin_reserves_list' mode='specify_date' %}">
+            <span class="icon">
+                <i class="far fa-caret-right"></i>
+            </span>
+            予約確認(今日)
+            </a>
+        </li>
+    </ul>
+    <p class="menu-label has-text-info is-size-5">
+        <span class="icon has-text-info">
+        <i class="fas fa-store"></i>
+        </span>
+        店舗設定
+    </p>
+    <ul class="menu-list">
+        <li>
+            <a href="{% url 'holidays_list' %}">
+            <span class="icon">
+                <i class="far fa-caret-right"></i>
+            </span>
+            休日管理
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'schedules_list' %}">
+            <span class="icon">
+                <i class="far fa-caret-right"></i>
+            </span>
+            営業時間管理
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'seats_list' %}">
+            <span class="icon">
+                <i class="far fa-caret-right"></i>
+            </span>
+            座席管理
+            </a>
+        </li>        
+    </ul>
+    <p class="menu-label has-text-info is-size-5">
+        <span class="icon has-text-info">
+        <i class="fas fa-cat"></i>
+        </span>
+        その他
+    </p>
+    <ul class="menu-list">
+        <li>
+            <a href="{% url 'admin_user_list' %}">
+            <span class="icon">
+                <i class="far fa-caret-right"></i>
+            </span>
+            ユーザ一覧
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'user_admin_debug' %}">
+            <span class="icon">
+                <i class="far fa-caret-right"></i>
+            </span>
+            デバッグ
+            </a>
+        </li>
+    </ul>
+</aside>
+
+
+{% endblock content %}

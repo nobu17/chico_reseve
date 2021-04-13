@@ -1,0 +1,25 @@
+{% extends '../base.html' %} 
+{% block header %} 
+{% endblock header %}
+{% block content %}
+<h2 class="title has-text-centered">デバッグモード</h2>
+<p class="has-text-danger has-text-centered">※テスト時以外には使用しないでください。</p>
+
+<div class="columns">
+    <div class="column m-3">
+        <a class="button is-danger is-fullwidth" href="{% url 'user_admin_debug' 'delete_reserve' %}" href="" onclick="return confirm('本当に削除してもよろしいですか？')">予約データクリア</a>
+    </div>
+    <div class="column m-3">
+        <a class="button is-danger is-fullwidth" href="{% url 'user_admin_debug' 'delete_user' %}" href="" onclick="return confirm('本当に削除してもよろしいですか？')">ユーザクリア</a>
+    </div>
+</div>
+
+<div class="columns">
+    <div class="column m-3">
+        <a class="button is-info is-fullwidth" href="{% url 'user_admin' %}">戻る</a>
+    </div>
+</div>
+
+
+
+{% endblock content %}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %} {% block header %} {% endblock header %}
+{% block content %}
+{% load static %}
+<div class="columns">
+    <div class="column mt-2 is-hidden-mobile">
+        <section class="hero is-medium is-link mt-4">
+        <div class="hero-body mt-4">
+            <p class="title has-text-centered">
+            CHICO★SPICE
+            </p>
+            <p class="subtitle has-text-centered">
+            予約ページ
+            </p>
+        </div>
+        </section>
+    </div>
+    <div class="column mt-1 is-hidden-tablet">
+        <section class="hero is-small is-link mt-1">
+        <div class="hero-body mt-1">
+            <p class="title has-text-centered">
+            CHICO★SPICE
+            </p>
+            <p class="subtitle has-text-centered">
+            予約ページ
+            </p>
+        </div>
+        </section>
+    </div>
+    <div class="column mt-3">
+        <img src="{% static 'image/top.jpg' %}" />
+    </div>
+</div>
+
+
+<div class="bd-focus">
+  <div class="container">
+    <nav class="columns is-centered">
+
+      <a class="mx-4 bd-focus-item column is-centered has-text-centered" href="{% url 'reserve' %}">
+        <div class="bd-focus-graph is-centered">
+          <figure class="bd-focus-cubes bd-focus-icon">
+            <span class="bd-focus-cube bd-focus-cube-1 icon is-large">
+              <i class="fas fa-2x fa-cube"></i>
+            </span>
+            <span class="bd-focus-cube bd-focus-cube-2 icon is-large">
+              <i class="fas fa-2x fa-cube"></i>
+            </span>
+            <span class="bd-focus-cube bd-focus-cube-3 icon is-large">
+              <i class="fas fa-2x fa-cube"></i>
+            </span>
+          </figure>
+        </div>
+        <div class="bd-focus-text is-centered">
+            <p class="title is-4 has-text-danger">
+            <strong>予約する</strong>
+          </p>
+          <p class="subtitle is-6">
+            ※ログインが必要になります。
+          </p>
+        </div>
+      </a>
+    </nav>
+  </div>
+</div>
+
+
+{% endblock content %}

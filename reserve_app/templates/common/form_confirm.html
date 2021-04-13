@@ -1,0 +1,38 @@
+{% if form.errors %}
+    <div class="errorlist">
+        {% for errors in form.errors.values %}
+            {% for error in errors %}
+                {{ error }}<br>
+            {% endfor %}
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="table-container">
+<table class="table has-text-left is-bordered is-striped center is-fullwidth">
+  <thead>
+    <tr class="has-background-info-light">
+      <th>項目</th>
+      <th>内容</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for field in form %}
+        <tr>
+            <td class="wide-column-medium">{{ field.label_tag }}</td>
+            <td class="warap-td">
+            {% if replace_dict and field.name in replace_dict %}
+             {% for key,value in replace_dict.items %}
+              {% if key == field.name %}
+               {{ value | linebreaks }}
+              {% endif %}
+             {% endfor %}
+            {% else %}
+              {{ field.value | linebreaks}}
+            {% endif %}
+            </td>        
+        </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
