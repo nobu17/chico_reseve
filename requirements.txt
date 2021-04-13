@@ -2,3 +2,5 @@ django
 python-dotenv
 django-allauth
 django-widget-tweaks
+mysqlclient
+

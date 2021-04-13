@@ -30,7 +30,17 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['localhost', '.pythonanywhere.com']
+# for python anywhre
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.1/howto/static-files/
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
 
 
 # Application definition
@@ -136,14 +146,6 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
-
-STATIC_URL = '/static/'
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "static"),
-)
 
 # auth
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
