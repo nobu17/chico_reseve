@@ -425,6 +425,7 @@ class ReserveCalcLogic:
         self.__reserve_number = reserve_number
         self.__max_days = max_days
         self.__duration_minutes = duration_minutes
+        # if seelct_date is none set tomorrow and then it is checked by calc_select_dates methods
         self.__select_date = util.DateUtil.get_date(select_date, self.__max_days, const.OFFSET_DAYS_START_RESERVE)
 
     def calc_select_dates(self):
@@ -443,6 +444,9 @@ class ReserveCalcLogic:
             select_dates.append(dt)
 
         self.__select_dates = select_dates
+        # select_date is setted without selectable at init, so if it is not match list, select again
+        if (self.__select_date not in self.__select_dates) and (len(self.__select_dates) > 0):
+            self.__select_date = self.__select_dates[0]
 
     def get_select_date(self):
         return self.__select_date
