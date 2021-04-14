@@ -97,9 +97,10 @@
       </div>
     </div>
   </nav>
-  <div class="container">
+  <div class="main">
   </br>
-  <div class="mr-2 ml-2">
+    <div class="container">
+    <div class="mr-2 ml-2">
     {% comment %} {% if user.is_authenticated %}
       <p>Welconme: {{ user.username }}</p>
       <a href="{% url 'account_logout' %}">Logout</a>
@@ -113,13 +114,12 @@
       {% block header %} {% endblock header %} 
       {% block content %} {% endblock content %}
     </div>
-  </div>
-  <footer class="footer">
-    <div class="container">
+    </div>
+    <footer class="footer">
       <div class="content has-text-centered">
         2021 @CHICO★SCPICE
       </div>
-    </div>
   </footer>
+  </div>
   </body>
 </html>
