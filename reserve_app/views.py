@@ -432,8 +432,8 @@ class ReserveCalcLogic:
         set availalbe dates of reserve
         """
         select_dates = []
-        # get reservable all days from current date + 1 (day)
-        base_date = datetime.datetime.now().date() + datetime.timedelta(days=1)
+        # get reservable all days from current date + offset (day) (not using selected_date)
+        base_date = datetime.datetime.now().date() + datetime.timedelta(days=const.OFFSET_DAYS_START_RESERVE)
         all_days = util.DateUtil.get_ranges(base_date, self.__max_days)
         # filter actual days by available schedules
         all_days = models.WeeklyScheduleModel.get_filtered_date_by_availalble_dayofweeks(all_days)
