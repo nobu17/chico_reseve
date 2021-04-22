@@ -3,4 +3,5 @@ python-dotenv
 django-allauth
 django-widget-tweaks
 mysqlclient
+python-dateutil
 
