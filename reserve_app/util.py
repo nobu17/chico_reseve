@@ -1,5 +1,7 @@
 import datetime
+import calendar
 import locale
+from dateutil.relativedelta import relativedelta
 
 
 class DateTimeUtil:
@@ -89,7 +91,32 @@ class DateUtil:
                 return base_day
 
         return result
-    
+
+    @staticmethod
+    def get_months_date(base_date, start_offset_month, end_offset_month):
+        start_date = base_date + relativedelta(months=(-start_offset_month))
+        end_date = base_date + relativedelta(months=end_offset_month)
+        start = datetime.date(start_date.year, start_date.month, 1)
+        end = datetime.date(end_date.year, end_date.month, calendar.monthrange(end_date.year, end_date.month)[1])
+        delta = end - start
+
+        result = []
+        for i in range(delta.days + 1):
+            result.append((start + datetime.timedelta(days=i)))
+
+        return result
+
+    @staticmethod
+    def get_start_and_end(base_date, start_offset_month, end_offset_month):
+        start_date = base_date + relativedelta(months=(-start_offset_month))
+        end_date = base_date + relativedelta(months=end_offset_month)
+        start = datetime.date(start_date.year, start_date.month, 1)
+        end = datetime.date(end_date.year, end_date.month, calendar.monthrange(end_date.year, end_date.month)[1])
+
+        result = [start, end]
+
+        return result
+
     @staticmethod
     def parse(date):
         result = None
@@ -108,6 +135,16 @@ class DateUtil:
     def get_date_from_now(offset_days):
         now = datetime.datetime.now().date()
         return now + datetime.timedelta(days=offset_days)
+
+    @staticmethod
+    def get_date_ranges(start_date, end_date):
+        result = []
+        # to include start
+        start = start_date + datetime.timedelta(days=-1)
+        for n in range((end_date - start).days):
+            result.append(start_date + datetime.timedelta(n))
+
+        return result
 
 
 class NumberUtil:

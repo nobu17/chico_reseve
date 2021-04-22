@@ -11,9 +11,13 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-calendar@6.0.0/dist/css/bulma-calendar.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-extensions@6.2.7/bulma-checkradio/dist/css/bulma-checkradio.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-social@2/css/all.min.css" />
+    <link rel="stylesheet" href="{% static 'calendar/css/pignose.calendar.min.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/appstyle.css' %}" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bulma-calendar@6.0.0/dist/js/bulma-calendar.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bulma-extensions@6.2.7/dist/js/bulma-extensions.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="{% static 'calendar/js/pignose.calendar.full.min.js' %}"></script>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         // Get all "navbar-burger" elements
@@ -97,26 +101,17 @@
   <div class="main">
   </br>
     <div class="container">
-    <div class="mr-2 ml-2">
-    {% comment %} {% if user.is_authenticated %}
-      <p>Welconme: {{ user.username }}</p>
-      <a href="{% url 'account_logout' %}">Logout</a>
-      <p>isStaff: {{ user.is_staff }}</p>
-      <p>is_superuser: {{ user.is_superuser }}</p>
-    {% else %}
-      <a href="{% url 'account_login' %}">Login</a>
-    {% endif %} {% endcomment %}
-
-      {% include './common/message.html' %}
-      {% block header %} {% endblock header %} 
-      {% block content %} {% endblock content %}
-    </div>
+      <div class="mr-2 ml-2">
+        {% include './common/message.html' %}
+        {% block header %} {% endblock header %} 
+        {% block content %} {% endblock content %}
+      </div>
     </div>
     <footer class="footer">
       <div class="content has-text-centered">
         2021 @CHICO★SCPICE
       </div>
-  </footer>
+    </footer>
   </div>
   </body>
 </html>

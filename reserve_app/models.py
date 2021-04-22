@@ -205,6 +205,10 @@ class ReserveModel(models.Model):
         return ReserveModel.objects.filter(start_date=start_date).order_by('-start_time')
 
     @classmethod
+    def get_by_date_ranges(cls, start_date, end_date):
+        return ReserveModel.objects.filter(canceled=False, start_date__gte=start_date, start_date__lte=end_date).order_by('-start_date', '-start_time')
+
+    @classmethod
     def get_user_all_reserve(cls, user_id):
         return ReserveModel.objects.filter(user=user_id).order_by('-start_date', '-start_time')
 

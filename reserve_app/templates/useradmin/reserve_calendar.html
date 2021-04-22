@@ -1,0 +1,207 @@
+{% extends '../base.html' %} {% block header %} {% endblock header %} 
+{% block content %}
+<h2 class="title has-text-centered">カレンダー</h2>
+<a class="button is-danger" href="{% url 'user_admin' %}">戻る</a>
+
+<div class="cal_container" style="width:100%;">
+  <div class="calendar" style="margin:30px -30px;"></div>
+</div>
+
+<p id="date_title" class="subtitle has-text-centered"></p>
+<div id="no_reserve_message">
+ <p class="subtitle has-text-centered has-text-danger">予約はありません。</p>
+ </br>
+</div>
+<div id="reserve_list" class="table-container">
+<table class="table has-text-centered is-fullwidth">
+  <thead>
+    <tr>
+      <th>予約時間</th>
+      <th>ユーザ名</th>
+      <th>電話番号</th>
+      <th>メールアドレス</th>
+      <th>人数</th>
+      <th>席</th>
+      <th>申込日</th>
+      <th>備考等</th>
+      <th>キャンセル</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="table_body">
+  </tbody>
+</table>
+</div>
+
+
+<script>
+    let start_and_end = {{start_and_end_dates | safe}}
+    let holidays = {{holidays | safe}}
+    let disabled_day_of_weeks = {{disabled_day_of_weeks | safe}}
+    let reserves_by_date = {{reserves_by_date | safe}}
+    let reserves_date_list = {{reserves_date_list | safe}}
+    let init_date = "{{ select_date | safe}}"
+    let current_date = init_date;
+    let cancel_url = "/admin/reserves_cancel/"
+    let base_url = "{% url 'admin_reserve_calendar' %}"
+
+    window.onload = () => {
+        change_table_visibility(false);
+        change_no_reserve_message(false);
+        // const now = formatDate(new Date());
+        $('.calendar').pignoseCalendar(
+            {
+                disabledDates: holidays,
+                minDate: start_and_end[0],
+                maxDate: start_and_end[1],
+                disabledWeekdays: convert_day_of_week(disabled_day_of_weeks),
+                theme: 'blue',
+                lang: 'jp',
+                schedules: reserves_date_list,
+                scheduleOptions: {
+                    colors: {
+                        reserve: '#ef8080',
+                    }
+                },
+                select: on_select_date,
+                date: init_date
+            }
+        );
+        display_table(init_date);
+    };
+
+
+    function on_select_date(date, context) {
+        clear_table();
+        if (date && date[0]) {
+            current_date = date[0].format('YYYY-MM-DD');
+            display_table(date[0].format('YYYY-MM-DD'));
+        }  else {
+            change_table_visibility(false);
+            change_no_reserve_message(false);
+            display_date_title(null);
+        }
+    }
+
+    function change_table_visibility(isDisplay) {
+        if (isDisplay) {
+            document.getElementById("reserve_list").style.visibility = "visible";      
+        } else {
+            document.getElementById("reserve_list").style.visibility = "hidden";
+        }
+    }
+
+    function change_no_reserve_message(isDisplay) {
+         if (isDisplay) {
+            document.getElementById("no_reserve_message").style.display = "inline";       
+        } else {
+            document.getElementById("no_reserve_message").style.display = "none";
+        }       
+    }
+
+    function display_table(dateStr) {
+        display_date_title(dateStr);
+        if (reserves_by_date[dateStr]) {
+            change_table_visibility(true);
+            change_no_reserve_message(false);
+            const reserve_list = reserves_by_date[dateStr];
+            for (const reserve of reserve_list) {
+                create_reserve_record(reserve)
+            }
+        } else {
+            change_table_visibility(false);
+            change_no_reserve_message(true);       
+        }
+    }
+
+    function display_date_title(dateStr) {
+        if (dateStr) {
+            document.getElementById("date_title").innerHTML = dateStr
+        } else {
+            document.getElementById("date_title").innerHTML = ""            
+        }
+    }
+
+    function clear_table() {
+        const root = document.getElementById("table_body");
+        root.innerHTML = '';        
+    }
+
+    function create_reserve_record(reserve) {
+        const tr = document.createElement("tr");
+
+        const start_time = document.createElement("td");
+        start_time.setAttribute("class","wide-column-small");
+        start_time.appendChild(document.createTextNode(reserve.start_time));
+        tr.appendChild(start_time);
+
+        const full_name = document.createElement("td");
+        full_name.setAttribute("class","wide-column-medium");
+        full_name.appendChild(document.createTextNode(reserve.full_name));
+        tr.appendChild(full_name);
+
+        const tel = document.createElement("td");
+        tel.setAttribute("class","wide-column-medium");
+        tel.appendChild(document.createTextNode(reserve.tel));
+        tr.appendChild(tel);
+
+        const email = document.createElement("td");
+        email.setAttribute("class","wide-column-medium");
+        email.appendChild(document.createTextNode(reserve.email));
+        tr.appendChild(email);
+
+        const number = document.createElement("td");
+        number.setAttribute("class","wide-column-small");
+        number.appendChild(document.createTextNode(reserve.number));
+        tr.appendChild(number);
+
+        const seat = document.createElement("td");
+        seat.setAttribute("class","wide-column-medium");
+        seat.appendChild(document.createTextNode(reserve.seat_name));
+        tr.appendChild(seat);
+
+        const created_at = document.createElement("td");
+        created_at.setAttribute("class","wide-column");
+        created_at.appendChild(document.createTextNode(reserve.created_at));
+        tr.appendChild(created_at);
+
+        const memo = document.createElement("td");
+        memo.setAttribute("class","wide-column");
+        memo.appendChild(document.createTextNode(reserve.memo));
+        tr.appendChild(memo);
+
+        const cancel = document.createElement("td");
+        cancel.setAttribute("class","wide-column-small");
+        const button = document.createElement("a");
+        button.setAttribute("class","button is-danger");
+        button.setAttribute("href", cancel_url + reserve.pk + "?backurl=" + base_url + current_date );
+        button.appendChild(document.createTextNode("キャンセルする"));
+        cancel.appendChild(button);
+        tr.appendChild(cancel);
+
+        const root = document.getElementById("table_body");
+        root.innerHTML = '';
+        root.appendChild(tr);
+    }
+
+    function convert_day_of_week(day_of_weeks) {
+        const results = [];
+        for(const day_of_week of day_of_weeks) {
+            if (day_of_week >= 6) {
+                results.push(0);
+            } else {
+                results.push(day_of_week + 1);
+            }
+        }
+        return results;
+    }
+
+    function formatDate(dt) {
+        var y = dt.getFullYear();
+        var m = ('00' + (dt.getMonth()+1)).slice(-2);
+        var d = ('00' + dt.getDate()).slice(-2);
+        return (y + '-' + m + '-' + d);
+    }
+</script>
+
+{% endblock content %}

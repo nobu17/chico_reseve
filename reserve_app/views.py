@@ -13,6 +13,7 @@ from . import forms
 from . import util
 from . import const
 from . import logics
+from . import encode
 import datetime
 import json
 import locale
@@ -212,6 +213,28 @@ class AdminReserveList(generic.ListView):
             return util.DateUtil.parse(select_date)
         except Exception:
             return datetime.datetime.now().date()
+
+
+@method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+class AdminReserveCalendar(generic.TemplateView):
+    template_name = "useradmin/reserve_calendar.html"
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        select_date = self.kwargs.get('select_date')
+        select_date = util.DateUtil.get_date(select_date, 30, 0)
+        ctx['select_date'] = select_date
+        
+        logic = logics.ReserveCalendar(datetime.datetime.now().date())
+        ctx['holidays'] = json.dumps(logic.get_holidays())
+        ctx['disabled_day_of_weeks'] = json.dumps(logic.get_disabled_day_of_weeks())
+        ctx['start_and_end_dates'] = json.dumps(logic.get_start_and_end_dates())
+        ctx['reserves_by_date'] = json.dumps(logic.get_reserves_by_date(), cls=encode.ModelEncoder)
+        ctx['reserves_date_list'] = json.dumps(logic.get_reserves_date_list())
+
+        return ctx
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
