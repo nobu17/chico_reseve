@@ -99,9 +99,8 @@ class SendEmail:
         message += "予約内容は以下の通りです。\n\n\n"
         message = self.__create_reserve_common_message_for_user(message, reserve_model)
         message += CommonSetting.get_reserve_complete_user_message()
-
         # send to user
-        send_mail(subject, message, self.__from_email, [reserve_model.email])
+        self.__send_email(subject, message, self.__from_email, [reserve_model.email])
 
         # send to admins
         subject = "予約通知"
@@ -109,7 +108,7 @@ class SendEmail:
         message += "予約内容は以下の通りです。\n\n\n"
         message = self.__create_reserve_common_message_for_admin(message, reserve_model)
         # send to admin
-        send_mail(subject, message, self.__from_email, self.__admin_emails)
+        self.__send_email(subject, message, self.__from_email, self.__admin_emails)
 
     def send_cancel_completed(self, reserve_model):
         """
@@ -124,9 +123,8 @@ class SendEmail:
         message += "キャンセル内容は以下の通りです。\n\n\n"
         message = self.__create_reserve_common_message_for_user(message, reserve_model)
         message += CommonSetting.get_reserve_cancel_user_message()
-        
         # send to user
-        send_mail(subject, message, self.__from_email, [reserve_model.email])
+        self.__send_email(subject, message, self.__from_email, [reserve_model.email])
 
         # send to admins
         subject = "予約キャンセル通知"
@@ -134,7 +132,13 @@ class SendEmail:
         message += "予約内容は以下の通りです。\n\n\n"
         message = self.__create_reserve_common_message_for_admin(message, reserve_model)
         # send to admin
-        send_mail(subject, message, self.__from_email, self.__admin_emails)
+        self.__send_email(subject, message, self.__from_email, self.__admin_emails)
+
+    def __send_email(self, subject, message, from_email, to_emails):
+        try:
+            send_mail(subject, message, from_email, to_emails)
+        except Exception as e:
+            print("mail send failed:", e)
 
     def __create_reserve_common_message_for_user(self, message, reserve_model):
         message += "○予約日時\n"
