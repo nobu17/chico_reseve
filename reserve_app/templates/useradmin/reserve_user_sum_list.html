@@ -1,0 +1,40 @@
+{% extends '../base.html' %} {% block header %} {% endblock header %} 
+{% block content %}
+<h2 class="title has-text-centered">予約一覧({{ title }})</h2>
+<a class="button is-danger" href="{% url 'user_admin' %}">戻る</a>
+
+{% if object_list %}
+<div class="table-container">
+<table class="table has-text-centered is-fullwidth">
+  <thead>
+    <tr>
+      <th>名前</th>
+      <th>有効予約数</th>
+      <th>最終予約日</th>
+      <th>電話番号</th>
+      <th>メールアドレス(social)</th>
+      <th>メールアドレス</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+      {% for reserve in object_list %}
+      <tr>
+        <td class="wide-column-small"><a href="{% url 'admin_reserves_list' mode='user' param=reserve.user %}">{{ reserve.user__username }}</a></td>
+        <td class="wide-column-small">{{ reserve.count }}</td>
+        <td class="wide-column-small">{{ reserve.last_start_date }}</td>
+        <td class="wide-column-medium">{{ reserve.user__tel_number }}</td>
+        <td class="wide-column-medium">{{ reserve.user__email }}</td>
+        <td class="wide-column-medium">{{ reserve.user__second_email }}</td>
+      </tr>
+      {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p>予約履歴はありません。</p>
+{% endif %}
+
+{% include '../common/page_nation.html' %}
+
+{% endblock content %}

@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Count, Max
 from django.core.validators import MaxValueValidator, MinValueValidator, EmailValidator
 from accounts.models import CustomUser
 import datetime
@@ -253,6 +253,10 @@ class ReserveModel(models.Model):
         offset_time = util.TimeUtil.sub_minutes(now.time(), 10)
         print("offset", offset_time)
         return ReserveModel.objects.filter(user=user_id, canceled=False).filter(Q(start_date__gte=today_date) | Q(start_date=today_date, start_time__gte=offset_time))
+
+    @classmethod
+    def get_reserve_sum_by_user(cls):
+        return ReserveModel.objects.filter(canceled=False).select_related().values('user', 'user__username', 'user__tel_number', 'user__tel_number', 'user__email', 'user__second_email').annotate(count=Count('user'), last_start_date=Max('start_date')).order_by('-count')
 
     @classmethod
     def update_canceled(cls, reserve_pk, value):

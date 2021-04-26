@@ -203,6 +203,22 @@ class ScheduleDelete(generic.DeleteView):
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+class AdminReserveUserSumList(generic.ListView):
+    template_name = "useradmin/reserve_user_sum_list.html"
+    paginate_by = 100
+    model = models.ReserveModel
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['title'] = "ユーザー別集計"
+        return ctx
+
+    def get_queryset(self):
+        result = models.ReserveModel.get_reserve_sum_by_user()
+        return result
+
+
+@method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
 class AdminReserveList(generic.ListView):
     template_name = "useradmin/reserve_list.html"
     paginate_by = 10
