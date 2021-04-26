@@ -28,5 +28,8 @@ class CustomUser(AbstractUser):
         else:
             return ""
 
+    def get_admins():
+        return CustomUser.objects.filter(is_superuser=True, is_staff=True)
+
     class Meta:
         verbose_name_plural = 'CustomUser'

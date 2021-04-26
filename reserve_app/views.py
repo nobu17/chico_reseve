@@ -36,12 +36,15 @@ class UserAdminIndex(generic.TemplateView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
+        user_message = self.request.GET.get('user_message')
+
         today_date = util.DateUtil.get_date_from_now(0)
         tomorrow_date = util.DateUtil.get_date_from_now(1)
 
         today_reserve_count = models.ReserveModel.get_reserve_count_by_date(today_date)
         tomorrow_reserve_count = models.ReserveModel.get_reserve_count_by_date(tomorrow_date)
 
+        ctx['user_message'] = user_message
         ctx['today_reserve_count'] = today_reserve_count
         ctx['tomorrow_reserve_count'] = tomorrow_reserve_count
         ctx['tomorrow_date'] = tomorrow_date.strftime('%Y-%m-%d')
@@ -64,6 +67,40 @@ class UserAdminDebug(generic.TemplateView):
 
         context = {}
         return self.render_to_response(context)
+
+
+@method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+class AdminCommonSettings(generic.View):
+    template_name = "useradmin/common_settings.html"
+    model = models.CommonSettingModel
+    form_class = forms.CommonSettingsModelForm
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        form.load()
+
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            user_message = ""
+            try:
+                form.save()
+                user_message = "データの更新が完了しました。"
+            except Exception as e:
+                user_message = e
+
+            redirect_url = reverse_lazy('user_admin')
+            parameters = urlencode({'user_message': user_message})
+            url = f'{redirect_url}?{parameters}'
+            return redirect(url)
+
+        return render(request, self.template_name, {'form': form})
+
+    def form_invalid(self, form):
+        messages.error(self.request, "データの更新に失敗しました。", extra_tags='danger')
+        return super().form_invalid(form)
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
@@ -226,7 +263,7 @@ class AdminReserveCalendar(generic.TemplateView):
         select_date = self.kwargs.get('select_date')
         select_date = util.DateUtil.get_date(select_date, 30, 0)
         ctx['select_date'] = select_date
-        
+
         logic = logics.ReserveCalendar(datetime.datetime.now().date())
         ctx['holidays'] = json.dumps(logic.get_holidays())
         ctx['disabled_day_of_weeks'] = json.dumps(logic.get_disabled_day_of_weeks())
@@ -257,7 +294,9 @@ class AdminReserveCancel(generic.View):
         if form.is_valid():
             user_message = ""
             try:
-                form.cancel_admin(reserve_pk)
+                reserve = form.cancel_admin(reserve_pk)
+                send_mail = logics.SendEmail()
+                send_mail.send_cancel_completed(reserve)
                 user_message = "キャンセル完了しました。"
             except Exception as e:
                 user_message = e
@@ -393,7 +432,9 @@ def create_new(request):
                 if logic.check_availalbe_reserve(start_time):
                     user_message = "予約が完了しました。"
                     try:
-                        form.save(request.user)
+                        reserve = form.save(request.user)
+                        send_email = logics.SendEmail()
+                        send_email.send_reserve_complete(reserve)
                     except exceptions.ReserveCanNotSaveError as e:
                         user_message = e
 
@@ -430,7 +471,9 @@ def reserve_cancel(request, reserve_pk=None):
         if form.is_valid():
             user_message = ""
             try:
-                form.cancel(request.user, reserve_pk)
+                reserve = form.cancel(request.user, reserve_pk)
+                send_mail = logics.SendEmail()
+                send_mail.send_cancel_completed(reserve)
                 user_message = "キャンセル完了しました。"
             except Exception as e:
                 user_message = e

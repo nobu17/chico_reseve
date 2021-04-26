@@ -1,5 +1,6 @@
 from . import models
 from . import util
+from django.core.mail import send_mail
 
 
 class ReserveDuplicateCheck:
@@ -77,3 +78,123 @@ class ReserveCalendar:
 
     def get_reserves_date_list(self):
         return self.__reserves_date_list
+
+
+class SendEmail:
+    def __init__(self):
+        admin_mails = CommonSetting.get_admin_mails()
+        self.__admin_emails = [mail.strip() for mail in admin_mails.split(",")]
+        self.__from_email = CommonSetting.get_send_from_mail()
+
+    def send_reserve_complete(self, reserve_model):
+        """
+        send email about reserve is completed to user
+        send email about reserve is added to admin
+        """
+        if (reserve_model is None):
+            raise Exception("reserve model error")
+
+        subject = "予約完了しました。(CHICO★SPICE)"
+        message = "CHICO★SPICEの店舗予約が完了しました。\n"
+        message += "予約内容は以下の通りです。\n\n\n"
+        message = self.__create_reserve_common_message_for_user(message, reserve_model)
+        message += "○店舗からのメッセージ\n"
+        # todo: need to implemention message from db
+        message += CommonSetting.get_reserve_complete_user_message()
+
+        # send to user
+        send_mail(subject, message, self.__from_email, [reserve_model.email])
+
+        # send to admins
+        subject = "予約通知"
+        message = "新規予約が追加されました。\n"
+        message += "予約内容は以下の通りです。\n\n\n"
+        message = self.__create_reserve_common_message_for_admin(message, reserve_model)
+        # send to admin
+        send_mail(subject, message, self.__from_email, self.__admin_emails)
+
+    def send_cancel_completed(self, reserve_model):
+        """
+        send email about cancel is completed to user
+        send email about cancel is added to admin
+        """
+        if (reserve_model is None):
+            raise Exception("reserve model error")
+
+        subject = "予約をキャンセルしました。(CHICO★SPICE)"
+        message = "CHICO★SPICEの店舗予約をキャンセルしました。\n"
+        message += "キャンセル内容は以下の通りです。\n\n\n"
+        message = self.__create_reserve_common_message_for_user(message, reserve_model)
+        message += "○店舗からのメッセージ\n"
+        # todo: need to implemention message from db
+
+        # send to user
+        send_mail(subject, message, self.__from_email, [reserve_model.email])
+
+        # send to admins
+        subject = "予約キャンセル通知"
+        message = "予約がキャンセルされました。\n"
+        message += "予約内容は以下の通りです。\n\n\n"
+        message = self.__create_reserve_common_message_for_admin(message, reserve_model)
+        # send to admin
+        send_mail(subject, message, self.__from_email, self.__admin_emails)
+
+    def __create_reserve_common_message_for_user(self, message, reserve_model):
+        message += "○予約日時\n"
+        message += f"{util.DateTimeUtil.get_str(reserve_model.start_date, reserve_model.start_time)}\n\n"
+        message += "○予約人数\n"
+        message += f"{reserve_model.number} 名\n\n"
+        message += "○席\n"
+        message += f"{reserve_model.seat.name}\n\n"
+        return message
+
+    def __create_reserve_common_message_for_admin(self, message, reserve_model):
+        message += "○予約日時\n"
+        message += f"{util.DateTimeUtil.get_str(reserve_model.start_date, reserve_model.start_time)}\n\n"
+        message += "○予約人数\n"
+        message += f"{reserve_model.number} 名\n\n"
+        message += "○席\n"
+        message += f"{reserve_model.seat.name}\n\n"
+        message += "○ユーザー名\n"
+        message += f"{reserve_model.full_name}\n\n"
+        message += "○連絡先\n"
+        message += f"{reserve_model.tel}\n"
+        message += f"{reserve_model.email}\n\n"
+        return message
+
+
+class CommonSetting:
+    __send_from_mail_key = "send_from_mail"
+    __admin_mails_key = "admin_mails"
+    __reserve_complete_user_message_key = "reserve_complete_user_message"
+
+    @classmethod
+    def get_send_from_mail(cls):
+        return cls.__get_value(cls.__send_from_mail_key, "no-replay@chico.com")
+
+    @classmethod
+    def set_send_from_mail(cls, value):
+        models.CommonSettingModel.set_value(cls.__send_from_mail_key, value)
+
+    @classmethod
+    def get_reserve_complete_user_message(cls):
+        return cls.__get_value(cls.__reserve_complete_user_message_key, "")
+
+    @classmethod
+    def set_reserve_complete_user_message(cls, value):
+        models.CommonSettingModel.set_value(cls.__reserve_complete_user_message_key, value)
+
+    @classmethod
+    def get_admin_mails(cls):
+        return cls.__get_value(cls.__admin_mails_key, "no-replay@chico.com")
+
+    @classmethod
+    def set_admin_mails(cls, value):
+        models.CommonSettingModel.set_value(cls.__admin_mails_key, value)
+
+    @classmethod
+    def __get_value(cls, key, default_value):
+        result = models.CommonSettingModel.get_value(key)
+        if result is None:
+            return default_value
+        return result.value

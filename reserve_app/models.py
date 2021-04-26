@@ -161,8 +161,6 @@ class SeatModel(models.Model):
         return self.max_count_of_one_reserve * self.capacity
 
     def get_use_seat_count(self, reserve_number):
-        print("reserve_number", reserve_number)
-        print("capa", self.capacity)
         return reserve_number // self.capacity
 
 
@@ -261,3 +259,24 @@ class ReserveModel(models.Model):
         reserve = ReserveModel.objects.filter(pk=reserve_pk).first()
         reserve.canceled = value
         reserve.save()
+        return reserve
+
+
+class CommonSettingModel(models.Model):
+    key = models.CharField(max_length=30)
+    value = models.CharField(max_length=5000)
+
+    @classmethod
+    def get_value(cls, key):
+        return CommonSettingModel.objects.filter(key=key).first()
+
+    @classmethod
+    def set_value(cls, key, value):
+        model = CommonSettingModel.get_value(key)
+        if model is None:
+            model = CommonSettingModel()
+
+        model.key = key
+        model.value = value
+        print("valueeee", key, value)
+        model.save()

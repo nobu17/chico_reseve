@@ -5,8 +5,41 @@ from . import models
 from . import exceptions
 from . import const
 from . import util
+from . import logics
 
 TELLNUMBER_REGEX = RegexValidator(regex=r'^[0-9]+$', message=("電話番号は数値のみ入力可能です。例：09012345678"))
+
+
+class CommonSettingsModelForm(forms.Form):
+    admin_mails = forms.CharField(
+        label='管理メール通知アドレス',
+        max_length=500,
+        required=True,
+        help_text="カンマ区切りで複数可能。500文字まで",
+    )
+    send_from_mail = forms.CharField(
+        label='自動送信メールのFromアドレス',
+        max_length=50,
+        required=True,
+        help_text="50文字まで",
+    )
+    reserve_complete_user_message_key = forms.CharField(
+        label='予約完了時の店舗からのメッセージ',
+        max_length=1000,
+        required=True,
+        help_text="1000文字まで",
+        widget=forms.Textarea(attrs={'class': 'textarea', 'rows': '5'})
+    )
+
+    def load(self):
+        self.fields['admin_mails'].initial = logics.CommonSetting.get_admin_mails()
+        self.fields['send_from_mail'].initial = logics.CommonSetting.get_send_from_mail()
+        self.fields['reserve_complete_user_message_key'].initial = logics.CommonSetting.get_reserve_complete_user_message()
+
+    def save(self):
+        logics.CommonSetting.set_admin_mails(self.cleaned_data['admin_mails'].strip())
+        logics.CommonSetting.set_send_from_mail(self.cleaned_data['send_from_mail'].strip())
+        logics.CommonSetting.set_reserve_complete_user_message(self.cleaned_data['reserve_complete_user_message_key'].strip())
 
 
 class SpecialHolydayModelForm(forms.ModelForm):
@@ -272,14 +305,14 @@ class ReserveConfirmForm(forms.Form):
         if not models.ReserveModel.exists_user_availalbe_reserve(user.id, reserve_pk):
             raise exceptions.NotExistsReserveError("該当の予約は存在しません")
         try:
-            models.ReserveModel.update_canceled(reserve_pk, True)
+            return models.ReserveModel.update_canceled(reserve_pk, True)
         except Exception as e:
             print(e)
             raise exceptions.CancelFailedError("キャンセルの処理に失敗しました。お手数ですが再度お試しください。")
 
     def cancel_admin(self, reserve_pk):
         try:
-            models.ReserveModel.update_canceled(reserve_pk, True)
+            return models.ReserveModel.update_canceled(reserve_pk, True)
         except Exception as e:
             print(e)
             raise exceptions.CancelFailedError("キャンセルの処理に失敗しました。お手数ですが再度お試しください。")
@@ -315,3 +348,5 @@ class ReserveConfirmForm(forms.Form):
         update_target_user.tel_number = reserve.tel
         update_target_user.second_email = reserve.email
         update_target_user.save()
+
+        return reserve
