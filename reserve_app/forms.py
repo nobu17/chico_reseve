@@ -30,16 +30,25 @@ class CommonSettingsModelForm(forms.Form):
         help_text="1000文字まで",
         widget=forms.Textarea(attrs={'class': 'textarea', 'rows': '5'})
     )
+    reserve_cancel_user_message_key = forms.CharField(
+        label='予約キャンセル時の店舗からのメッセージ',
+        max_length=1000,
+        required=True,
+        help_text="1000文字まで",
+        widget=forms.Textarea(attrs={'class': 'textarea', 'rows': '5'})
+    )
 
     def load(self):
         self.fields['admin_mails'].initial = logics.CommonSetting.get_admin_mails()
         self.fields['send_from_mail'].initial = logics.CommonSetting.get_send_from_mail()
         self.fields['reserve_complete_user_message_key'].initial = logics.CommonSetting.get_reserve_complete_user_message()
+        self.fields['reserve_cancel_user_message_key'].initial = logics.CommonSetting.get_reserve_cancel_user_message()
 
     def save(self):
         logics.CommonSetting.set_admin_mails(self.cleaned_data['admin_mails'].strip())
         logics.CommonSetting.set_send_from_mail(self.cleaned_data['send_from_mail'].strip())
         logics.CommonSetting.set_reserve_complete_user_message(self.cleaned_data['reserve_complete_user_message_key'].strip())
+        logics.CommonSetting.set_reserve_cancel_user_message(self.cleaned_data['reserve_cancel_user_message_key'].strip())
 
 
 class SpecialHolydayModelForm(forms.ModelForm):

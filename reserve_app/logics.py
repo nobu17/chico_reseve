@@ -98,8 +98,6 @@ class SendEmail:
         message = "CHICO★SPICEの店舗予約が完了しました。\n"
         message += "予約内容は以下の通りです。\n\n\n"
         message = self.__create_reserve_common_message_for_user(message, reserve_model)
-        message += "○店舗からのメッセージ\n"
-        # todo: need to implemention message from db
         message += CommonSetting.get_reserve_complete_user_message()
 
         # send to user
@@ -125,9 +123,8 @@ class SendEmail:
         message = "CHICO★SPICEの店舗予約をキャンセルしました。\n"
         message += "キャンセル内容は以下の通りです。\n\n\n"
         message = self.__create_reserve_common_message_for_user(message, reserve_model)
-        message += "○店舗からのメッセージ\n"
-        # todo: need to implemention message from db
-
+        message += CommonSetting.get_reserve_cancel_user_message()
+        
         # send to user
         send_mail(subject, message, self.__from_email, [reserve_model.email])
 
@@ -146,6 +143,10 @@ class SendEmail:
         message += f"{reserve_model.number} 名\n\n"
         message += "○席\n"
         message += f"{reserve_model.seat.name}\n\n"
+        return message
+
+    def __create_common_inquire_message(self, message):
+        message += "本メールは送信専用です。"
         return message
 
     def __create_reserve_common_message_for_admin(self, message, reserve_model):
@@ -167,6 +168,7 @@ class CommonSetting:
     __send_from_mail_key = "send_from_mail"
     __admin_mails_key = "admin_mails"
     __reserve_complete_user_message_key = "reserve_complete_user_message"
+    __reserve_cancel_user_message_key = "reserve_cancel_user_message"
 
     @classmethod
     def get_send_from_mail(cls):
@@ -183,6 +185,14 @@ class CommonSetting:
     @classmethod
     def set_reserve_complete_user_message(cls, value):
         models.CommonSettingModel.set_value(cls.__reserve_complete_user_message_key, value)
+
+    @classmethod
+    def get_reserve_cancel_user_message(cls):
+        return cls.__get_value(cls.__reserve_cancel_user_message_key, "")
+
+    @classmethod
+    def set_reserve_cancel_user_message(cls, value):
+        models.CommonSettingModel.set_value(cls.__reserve_cancel_user_message_key, value)
 
     @classmethod
     def get_admin_mails(cls):
