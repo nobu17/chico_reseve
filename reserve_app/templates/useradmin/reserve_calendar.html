@@ -105,6 +105,7 @@
             change_table_visibility(true);
             change_no_reserve_message(false);
             const reserve_list = reserves_by_date[dateStr];
+            clear_table();
             for (const reserve of reserve_list) {
                 create_reserve_record(reserve)
             }
@@ -180,7 +181,6 @@
         tr.appendChild(cancel);
 
         const root = document.getElementById("table_body");
-        root.innerHTML = '';
         root.appendChild(tr);
     }
 
