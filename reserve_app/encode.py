@@ -1,9 +1,11 @@
 import json
+import datetime
 from . import models
 
 
 class ModelEncoder(json.JSONEncoder):
     def default(self, o):
+        # json encode is needed concern jst convert
         if isinstance(o, models.ReserveModel):
             return {
                 'pk': o.pk,
@@ -15,8 +17,8 @@ class ModelEncoder(json.JSONEncoder):
                 'full_name': o.full_name,
                 'tel': o.tel,
                 'email': o.email,
-                'created_at': o.created_at.strftime('%Y-%m-%d %H:%M'),
-                'updated_at': o.updated_at.strftime('%Y-%m-%d %H:%M'),
+                'created_at': o.created_at.astimezone(datetime.timezone(datetime.timedelta(hours=+9))).strftime('%Y-%m-%d %H:%M'),
+                'updated_at': o.updated_at.astimezone(datetime.timezone(datetime.timedelta(hours=+9))).strftime('%Y-%m-%d %H:%M'),
                 'seat_name': o.seat.name
             }
         return super(ModelEncoder, self).default(o)
