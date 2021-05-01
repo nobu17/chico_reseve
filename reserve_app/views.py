@@ -508,7 +508,9 @@ class ReserveCalcLogic:
         self.__max_days = max_days
         self.__duration_minutes = duration_minutes
         # if seelct_date is none set tomorrow and then it is checked by calc_select_dates methods
-        self.__select_date = util.DateUtil.get_date(select_date, self.__max_days, const.OFFSET_DAYS_START_RESERVE)
+        # admin can reserve today
+        start_offset_days = 0 if is_admin else const.OFFSET_DAYS_OF_RESERVE
+        self.__select_date = util.DateUtil.get_date(select_date, self.__max_days, start_offset_days)
         self.__is_admin = is_admin
 
     def calc_select_dates(self):
