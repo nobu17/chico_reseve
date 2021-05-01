@@ -509,7 +509,7 @@ class ReserveCalcLogic:
         self.__duration_minutes = duration_minutes
         # if seelct_date is none set tomorrow and then it is checked by calc_select_dates methods
         # admin can reserve today
-        start_offset_days = 0 if is_admin else const.OFFSET_DAYS_OF_RESERVE
+        start_offset_days = 0 if is_admin else const.OFFSET_DAYS_START_RESERVE
         self.__select_date = util.DateUtil.get_date(select_date, self.__max_days, start_offset_days)
         self.__is_admin = is_admin
 
@@ -520,7 +520,7 @@ class ReserveCalcLogic:
         select_dates = []
         # get reservable all days from current date + offset (day) (not using selected_date)
         # admin can reserve today
-        start_offset_days = 0 if self.__is_admin else const.OFFSET_DAYS_OF_RESERVE
+        start_offset_days = 0 if self.__is_admin else const.OFFSET_DAYS_START_RESERVE
         base_date = datetime.datetime.now().date() + datetime.timedelta(days=start_offset_days)
         all_days = util.DateUtil.get_ranges(base_date, self.__max_days)
         # filter actual days by available schedules
