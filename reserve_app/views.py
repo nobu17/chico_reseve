@@ -389,7 +389,7 @@ class MyReserveList(generic.ListView):
 
 @login_required
 def reserve_new(request, select_date=None, number=None):
-    # check reserve of existe
+    # check reserve of exists
     check = logics.ReserveDuplicateCheck(request.user)
     if not check.is_availalble_reserve():
         user_message = check.get_duplicated_error_message()
