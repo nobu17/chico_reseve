@@ -38,7 +38,7 @@
   <div class="field">
     {{ form.selected_time.label_tag }}
     <p class="has-text-danger">※スマホ等の場合、横にスクロールできます。</p>
-    <div class="switch-field">
+    <div id="select_time_radios" class="switch-field">
       {% for choice in form.selected_time %} 
       {{ choice.tag }}
       <label class="radio" for="{{ choice.id_for_label }}">
@@ -67,7 +67,7 @@
 
   <p>{{ form.selected_seat.label }}:</p>
   <p id="selected_set_error" class="has-text-danger"></p>
-  <div class="checkboxes-and-radios">
+  <div id="select_radios" class="checkboxes-and-radios">
       {% for choice in form.selected_seat %} 
       {{ choice.tag }}
       <label for="{{ choice.id_for_label }}">
@@ -304,12 +304,17 @@
       ele.addEventListener('invalid', function(e) {
         const errorPlace = document.getElementById('selected_set_error');
         errorPlace.innerHTML = "座席が未選択です。";
+        document.getElementById('select_radios').scrollIntoView(false);
       }, false);
       ele.addEventListener('change', function(e) {
         const errorPlace = document.getElementById('selected_set_error');
         errorPlace.innerHTML = "";
       }, false);      
     }
+    const select_time_radios = document.getElementById("select_time_radios");
+    select_time_radios.addEventListener('invalid', function(e) {
+        select_time_radios.scrollIntoView(false);
+      }, false);
   }
 
   window.onload = function () {
