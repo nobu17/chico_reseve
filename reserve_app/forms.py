@@ -328,8 +328,9 @@ class ReserveConfirmForm(forms.Form):
 
     def save(self, user):
         # if already reserved, refused (To do: neeed check canel and already passed schedule)
-        if models.ReserveModel.exists_user_reserve(user.id):
-            raise exceptions.ReserveCanNotSaveError("既に予約済みです。同時に予約できるのは１件のみです。")
+        check = logics.ReserveDuplicateCheck(user)
+        if not check.is_availalble_reserve():
+            raise exceptions.ReserveCanNotSaveError(check.get_duplicated_error_message())
 
         # creating reserve model
         reserve = models.ReserveModel()

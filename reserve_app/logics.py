@@ -8,10 +8,16 @@ class ReserveDuplicateCheck:
         self.__user = user
 
     def is_availalble_reserve(self):
+        # if user is administraotr, not check duplication
+        if self.__user.is_superuser:
+            return True
         if self.__user.id:
             if not models.ReserveModel.exists_user_reserve(self.__user.id):
                 return True
         return False
+
+    def get_duplicated_error_message(self):
+        return "既に予約済みです。同時に予約できるのは１件のみです。"
 
 
 class ReserveCalendar:

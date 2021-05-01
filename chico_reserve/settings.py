@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.line',
 
     'widget_tweaks',
+    # 'mailer'
 ]
 
 MIDDLEWARE = [

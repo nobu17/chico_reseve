@@ -392,7 +392,7 @@ def reserve_new(request, select_date=None, number=None):
     # check reserve of existe
     check = logics.ReserveDuplicateCheck(request.user)
     if not check.is_availalble_reserve():
-        user_message = "既に予約が存在します。予約は同時に1件のみ可能です。"
+        user_message = check.get_duplicated_error_message()
         redirect_url = reverse_lazy('my_page')
         parameters = urlencode({'user_message': user_message})
         url = f'{redirect_url}?{parameters}'
