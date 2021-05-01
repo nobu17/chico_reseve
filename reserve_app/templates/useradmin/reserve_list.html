@@ -23,7 +23,7 @@
   </thead>
   <tbody>
       {% for reserve in object_list %}
-      <tr>
+      <tr {% if reserve.canceled %} bgcolor="silver" {% endif %}>
         <td class="wide-column">{{ reserve.start_date }}</td>
         <td class="wide-column-small">{{ reserve.start_time }}</td>
         <td class="wide-column-medium"><a href="{% url 'admin_reserves_list' mode='user' param=reserve.user.id %}">{{ reserve.full_name }}</a></td>
