@@ -412,7 +412,7 @@ def reserve_new(request, select_date=None, number=None):
             errors = form.errors
 
     number = util.NumberUtil.getNumber(number, const.DEFAULT_RESERVE_NUMBER_OF_CUSTOMER, const.MAX_RESERVE_NUMBER_OF_CUSTOMER, 1)
-    logic = ReserveCalcLogic(select_date, number, const.OFFSET_DAYS_OF_RESERVE, const.DURATION_MINUTES_OF_RESERVE)
+    logic = ReserveCalcLogic(select_date, number, const.OFFSET_DAYS_OF_RESERVE, const.DURATION_MINUTES_OF_RESERVE, request.user.is_superuser)
     logic.calc_select_dates()
     logic.calc_reserve_time_list()
     logic.calc_seat_remain()
@@ -441,7 +441,7 @@ def create_new(request):
             start_time = form.cleaned_data['selected_time']
             # check available to reserve again
             with transaction.atomic():
-                logic = ReserveCalcLogic(select_date, number, const.OFFSET_DAYS_OF_RESERVE, const.DURATION_MINUTES_OF_RESERVE)
+                logic = ReserveCalcLogic(select_date, number, const.OFFSET_DAYS_OF_RESERVE, const.DURATION_MINUTES_OF_RESERVE, request.user.is_superuser)
                 logic.calc_select_dates()
                 logic.calc_reserve_time_list()
                 logic.calc_seat_remain()
@@ -503,12 +503,13 @@ def reserve_cancel(request, reserve_pk=None):
 
 
 class ReserveCalcLogic:
-    def __init__(self, select_date, reserve_number, max_days, duration_minutes):
+    def __init__(self, select_date, reserve_number, max_days, duration_minutes, is_admin):
         self.__reserve_number = reserve_number
         self.__max_days = max_days
         self.__duration_minutes = duration_minutes
         # if seelct_date is none set tomorrow and then it is checked by calc_select_dates methods
         self.__select_date = util.DateUtil.get_date(select_date, self.__max_days, const.OFFSET_DAYS_START_RESERVE)
+        self.__is_admin = is_admin
 
     def calc_select_dates(self):
         """
@@ -516,7 +517,9 @@ class ReserveCalcLogic:
         """
         select_dates = []
         # get reservable all days from current date + offset (day) (not using selected_date)
-        base_date = datetime.datetime.now().date() + datetime.timedelta(days=const.OFFSET_DAYS_START_RESERVE)
+        # admin can reserve today
+        start_offset_days = 0 if self.__is_admin else const.OFFSET_DAYS_OF_RESERVE
+        base_date = datetime.datetime.now().date() + datetime.timedelta(days=start_offset_days)
         all_days = util.DateUtil.get_ranges(base_date, self.__max_days)
         # filter actual days by available schedules
         all_days = models.WeeklyScheduleModel.get_filtered_date_by_availalble_dayofweeks(all_days)
