@@ -300,7 +300,7 @@
   function initValidationEvent() {
     // select seat radio button validation
     const elements = document.getElementsByName("selected_seat");
-    for (ele of elements) {
+    for (const ele of elements) {
       ele.addEventListener('invalid', function(e) {
         const errorPlace = document.getElementById('selected_set_error');
         errorPlace.innerHTML = "座席が未選択です。";
@@ -311,10 +311,13 @@
         errorPlace.innerHTML = "";
       }, false);      
     }
-    const select_time_radios = document.getElementById("select_time_radios");
-    select_time_radios.addEventListener('invalid', function(e) {
+
+    const time_elements = document.getElementsByName("selected_time");
+    for (const ele of time_elements) {
+      ele.addEventListener('invalid', function (e) {
         select_time_radios.scrollIntoView(false);
-      }, false);
+      });
+    }
   }
 
   window.onload = function () {
