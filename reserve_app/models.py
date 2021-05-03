@@ -259,7 +259,6 @@ class ReserveModel(models.Model):
         today_date = now.date()
         # 10 minutes before form current is available reserve
         offset_time = util.TimeUtil.sub_minutes(now.time(), 10)
-        print("offset", offset_time)
         return ReserveModel.objects.filter(user=user_id, canceled=False).filter(Q(start_date__gte=today_date) | Q(start_date=today_date, start_time__gte=offset_time))
 
     @classmethod
