@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.db import connection, transaction
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from urllib.parse import urlencode
 from . import exceptions
 from . import models
@@ -30,6 +31,7 @@ class Contact(generic.TemplateView):
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class UserAdminIndex(generic.TemplateView):
     template_name = "useradmin/index.html"
 
@@ -52,6 +54,7 @@ class UserAdminIndex(generic.TemplateView):
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class UserAdminDebug(generic.TemplateView):
     template_name = "useradmin/debug.html"
 
@@ -70,6 +73,7 @@ class UserAdminDebug(generic.TemplateView):
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class AdminCommonSettings(generic.View):
     template_name = "useradmin/common_settings.html"
     model = models.CommonSettingModel
@@ -104,12 +108,14 @@ class AdminCommonSettings(generic.View):
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class SepecialHolidayList(generic.ListView):
     template_name = "holidays/index.html"
     queryset = models.SpecialHolydayModel.get_all()
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class SepecialHolidayCreate(generic.CreateView):
     template_name = "holidays/create.html"
     model = models.SpecialHolydayModel
@@ -139,6 +145,7 @@ class SepecialHolidayCreate(generic.CreateView):
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class SepecialHolidayUpdate(generic.UpdateView):
     template_name = "holidays/update.html"
     model = models.SpecialHolydayModel
@@ -155,6 +162,7 @@ class SepecialHolidayUpdate(generic.UpdateView):
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class SepecialHolidayDelete(generic.DeleteView):
     template_name = "holidays/delete.html"
     model = models.SpecialHolydayModel
@@ -166,12 +174,14 @@ class SepecialHolidayDelete(generic.DeleteView):
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class ScheduleList(generic.ListView):
     template_name = "schedules/index.html"
     queryset = models.WeeklyScheduleModel.get_all()
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class ScheduleCreate(generic.CreateView):
     template_name = "schedules/create.html"
     model = models.WeeklyScheduleModel
@@ -184,6 +194,7 @@ class ScheduleCreate(generic.CreateView):
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class ScheduleUpdate(generic.UpdateView):
     template_name = "schedules/update.html"
     model = models.WeeklyScheduleModel
@@ -196,6 +207,7 @@ class ScheduleUpdate(generic.UpdateView):
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class ScheduleDelete(generic.DeleteView):
     template_name = "schedules/delete.html"
     model = models.WeeklyScheduleModel
@@ -203,6 +215,7 @@ class ScheduleDelete(generic.DeleteView):
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class AdminReserveUserSumList(generic.ListView):
     template_name = "useradmin/reserve_user_sum_list.html"
     paginate_by = 100
@@ -219,6 +232,7 @@ class AdminReserveUserSumList(generic.ListView):
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class AdminReserveList(generic.ListView):
     template_name = "useradmin/reserve_list.html"
     paginate_by = 10
@@ -269,6 +283,7 @@ class AdminReserveList(generic.ListView):
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class AdminReserveCalendar(generic.TemplateView):
     template_name = "useradmin/reserve_calendar.html"
     paginate_by = 10
@@ -291,6 +306,7 @@ class AdminReserveCalendar(generic.TemplateView):
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class AdminReserveCancel(generic.View):
     template_name = "useradmin/reserve_cancel.html"
     model = models.ReserveModel
@@ -326,6 +342,7 @@ class AdminReserveCancel(generic.View):
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class SeatList(generic.ListView):
     template_name = "seats/index.html"
     paginate_by = 10
@@ -334,6 +351,7 @@ class SeatList(generic.ListView):
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class SeatUpdate(generic.UpdateView):
     template_name = "seats/update.html"
     model = models.SeatModel
@@ -352,6 +370,7 @@ class SeatUpdate(generic.UpdateView):
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class AdminUserList(generic.ListView):
     template_name = "useradmin/user_list.html"
     model = models.CustomUser

@@ -165,9 +165,8 @@ ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login'
 ACCOUNT_LOGOUT_ON_GET = True
 
 # mail confiemation
-ACCOUNT_EMAIL_VARIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VARIFICATION = 'none'
 ACCOUNT_EMAIL_REQUIRED = True
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # social
 SOCIALACCOUNT_PROVIDERS = {
