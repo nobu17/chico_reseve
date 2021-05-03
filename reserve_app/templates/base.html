@@ -82,12 +82,14 @@
           <span>Logout</span>
         </a>
         {% else %}
+        {% comment %} 
         <a class="navbar-item" href="{% url 'account_login' %}">
           <span class="icon">
             <i class="fas fa-lock"></i>
           </span>
           <span>Login</span>
         </a>
+        {% endcomment %}
         {% endif %}
         <a class="navbar-item" href="{% url 'contact' %}">
           <span class="icon">
