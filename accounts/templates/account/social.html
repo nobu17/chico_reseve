@@ -5,7 +5,7 @@
 {% for provider in socialaccount_providers %}
 {% if provider.id == "openid" %}
 {% for brand in provider.get_brands %}
-<li>
+<li class="mr-4">
   <a title="{{brand.name}}" 
      class="socialaccount_provider {{provider.id}} {{brand.id}}" 
      href="{% provider_login_url provider.id openid=brand.openid_url process=process %}"
@@ -14,7 +14,7 @@
 {% endfor %}
 {% endif %}
 {% if provider.id == "line" %}
-<li>
+<li class="mr-4">
   <a title="{{provider.name}}" class="m-2 is-success is-fullwidth button is-info socialaccount_provider {{provider.id}}" 
      href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">
     <span class="icon mr-3">
@@ -24,7 +24,7 @@
      </a>
 </li>
 {% elif provider.id == "google" %}
-<li>
+<li class="mr-4">
   <a title="{{provider.name}}" class="m-2 is-danger is-fullwidth button is-info socialaccount_provider {{provider.id}}" 
      href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">
     <span class="icon mr-3">
@@ -34,7 +34,7 @@
      </a>
 </li>
 {% else %}
-<li>
+<li class="mr-4">
   <a title="{{provider.name}}" class="m-2 is-{{ provider.id }} is-fullwidth button is-info socialaccount_provider {{provider.id}}" 
      href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">
     <span class="icon mr-3">
