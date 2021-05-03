@@ -219,6 +219,14 @@ class ReserveModel(models.Model):
         return ReserveModel.objects.filter(canceled=False, start_date=date).count()
 
     @classmethod
+    def get_user_canceled_count(cls, user_id, check_start_date):
+        return ReserveModel.objects.filter(canceled=True, user=user_id, start_date__gte=check_start_date).count()
+
+    @classmethod
+    def get_canceled_reserves_group_by_user(cls, check_start_date):
+        return ReserveModel.objects.filter(canceled=True, start_date__gte=check_start_date).select_related().values('user', 'user__is_superuser', 'user__is_staff', 'user__username', 'user__tel_number', 'user__tel_number', 'user__email', 'user__second_email').annotate(count=Count('user')).order_by('-count')
+
+    @classmethod
     def exists_user_reserve(cls, user_id):
         now = datetime.datetime.now()
         today_date = now.date()
@@ -264,6 +272,10 @@ class ReserveModel(models.Model):
         reserve.canceled = value
         reserve.save()
         return reserve
+
+    @classmethod
+    def delete_canceled_reserve(cls, user_id):
+        return ReserveModel.objects.filter(canceled=True, user=user_id).delete()
 
 
 class CommonSettingModel(models.Model):

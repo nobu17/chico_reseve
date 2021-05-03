@@ -15,3 +15,7 @@ RESERVE_MINUTES_OFFSET = 60
 
 # start days of start reserve from now
 OFFSET_DAYS_START_RESERVE = 1
+
+# if user cancel count is over this number, user is banned
+BANNED_THRETHOLD_OF_CANCEL = 2
+BANNED_CHECK_PERIOD_OF_DAYS = 30

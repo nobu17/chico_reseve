@@ -1,3 +1,4 @@
+from . import const
 from . import models
 from . import util
 from django.core.mail import send_mail
@@ -6,6 +7,7 @@ from django.core.mail import send_mail
 class ReserveDuplicateCheck:
     """This class is responsible for checking reservation of user not to reserve multiplly
     """
+
     def __init__(self, user):
         self.__user = user
 
@@ -22,9 +24,47 @@ class ReserveDuplicateCheck:
         return "既に予約済みです。同時に予約できるのは１件のみです。"
 
 
+class UserBanCheck:
+    """This class is responsible for checking user banned or not
+    """
+
+    def __init__(self, user):
+        self.__user = user
+
+    def is_banned(self):
+        # super user can not be banned
+        if self._is_staff_or_admin():
+            return False
+        if self.__user.id:
+            threthold_date = util.DateUtil.get_date_from_now(-const.BANNED_CHECK_PERIOD_OF_DAYS)
+            canceld_count = models.ReserveModel.get_user_canceled_count(self.__user.id, threthold_date)
+            if canceld_count >= const.BANNED_THRETHOLD_OF_CANCEL:
+                return True
+        return False
+
+    def get_user_banned_message(self):
+        return "一定数のキャンセルを行ったため、予約不可能です。お手数ですがContactメニューから管理者に連絡をお願いいたします。"
+
+    def delete_banned_data(self):
+        if not self._is_staff_or_admin():
+            models.ReserveModel.delete_canceled_reserve(self.__user.id)
+
+    def get_banned_users(self):
+        threthold_date = util.DateUtil.get_date_from_now(-const.BANNED_CHECK_PERIOD_OF_DAYS)
+        # filter admins or not over thretholds
+        cancels = models.ReserveModel.get_canceled_reserves_group_by_user(threthold_date).filter(user__is_staff=False, user__is_superuser=False, count__gte=const.BANNED_THRETHOLD_OF_CANCEL)
+        return cancels
+
+    def _is_staff_or_admin(self):
+        if self.__user.is_superuser or self.__user.is_staff:
+            return True
+        return False
+
+
 class ReserveCalendar:
     """This class is responsible for manuplating calendar logics
     """
+
     def __init__(self, base_date):
         self.__base_date = base_date
         self.__calc_range_date()
@@ -93,6 +133,7 @@ class ReserveCalendar:
 class SendEmail:
     """This class is responsible for send email to admins or user
     """
+
     def __init__(self):
         admin_mails = CommonSetting.get_admin_mails()
         self.__admin_emails = [mail.strip() for mail in admin_mails.split(",")]

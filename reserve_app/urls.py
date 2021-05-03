@@ -45,6 +45,7 @@ urlpatterns = [
     path('admin/reserves_list/<str:mode>/<str:param>', views.AdminReserveList.as_view(), name='admin_reserves_list'),
     path('admin/reserves_cancel/<int:reserve_pk>', views.AdminReserveCancel.as_view(), name='admin_reserves_cancel'),
     path('admin/reserves_user_sum_list/', views.AdminReserveUserSumList.as_view(), name='admin_reserves_user_sum_list'),
+    path('admin/banned_user_list/', views.AdminBannedUser.as_view(), name='admin_banned_user_list'),
     path('admin/user_list/', views.AdminUserList.as_view(), name='admin_user_list'),
     path('admin/common_settings/', views.AdminCommonSettings.as_view(), name='admin_common_settings'),
 ]

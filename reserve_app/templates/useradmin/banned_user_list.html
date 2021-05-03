@@ -1,0 +1,45 @@
+{% extends '../base.html' %} {% block header %} {% endblock header %} 
+{% block content %}
+<h2 class="title has-text-centered">禁止ユーザ一覧</h2>
+<p class="has-text-centered has-text-danger">履歴クリアボタンで禁止ユーザから通常ユーザに戻ります。</p>
+<p class="has-text-centered has-text-danger">なお、履歴クリアを実施するとキャンセルの履歴は削除されます。</p>
+<a class="button is-danger" href="{% url 'user_admin' %}">戻る</a>
+{% if banned_users %}
+<div class="table-container">
+<table class="table has-text-centered is-fullwidth">
+  <thead>
+    <tr>
+      <th>名前</th>
+      <th>キャンセル数</th>
+      <th>電話番号</th>
+      <th>メールアドレス(social)</th>
+      <th>メールアドレス</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+      {% for reserve in banned_users %}
+      <tr>
+        <td class="wide-column-small"><a href="{% url 'admin_reserves_list' mode='user' param=reserve.user %}">{{ reserve.user__username }}</a></td>
+        <td class="wide-column-small">{{ reserve.count }}</td>
+        <td class="wide-column-medium">{{ reserve.user__tel_number }}</td>
+        <td class="wide-column-medium">{{ reserve.user__email }}</td>
+        <td class="wide-column-medium">{{ reserve.user__second_email }}</td>
+        <td>
+            <form action="{% url 'admin_banned_user_list' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="user" value="{{reserve.user}}"/>
+                <input class="button is-danger" type="submit" value="履歴クリア" onclick="return confirm('本当にクリアしてもよろしいですか？')">
+            </form>
+        </td>
+      </tr>
+      {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p class="has-text-centered">禁止ユーザはいません。</p>
+{% endif %}
+
+
+{% endblock content %}

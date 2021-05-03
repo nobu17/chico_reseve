@@ -109,6 +109,36 @@ class AdminCommonSettings(generic.View):
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
 @method_decorator(staff_member_required(login_url="/"), name="dispatch")
+class AdminBannedUser(generic.View):
+    template_name = "useradmin/banned_user_list.html"
+    model = models.CustomUser
+
+    def get(self, request, *args, **kwargs):
+        check = logics.UserBanCheck(request.user)
+        banned_users = check.get_banned_users()
+        return render(request, self.template_name, {'banned_users': banned_users})
+
+    def post(self, request, *args, **kwargs):
+        user_pk = request.POST.get("user", None)
+        if user_pk:
+            try:
+                user = models.CustomUser.get(user_pk)
+                check = logics.UserBanCheck(user)
+                check.delete_banned_data()
+                user_message = "データの更新が完了しました。"
+            except Exception as e:
+                user_message = e
+        else:
+            user_message = "ユーザが見つかりませんでした。"
+
+        redirect_url = reverse_lazy('user_admin')
+        parameters = urlencode({'user_message': user_message})
+        url = f'{redirect_url}?{parameters}'
+        return redirect(url)
+
+
+@method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class SepecialHolidayList(generic.ListView):
     template_name = "holidays/index.html"
     queryset = models.SpecialHolydayModel.get_all()
@@ -385,7 +415,6 @@ def my_page(request):
         reserves = models.ReserveModel.get_user_current_reserve(request.user.id)
     except Exception:
         reserves = None
-        print("no reserve!!!!")
 
     return render(request, 'user/index.html', {'user_message': user_message, 'reserves': reserves})
 
@@ -408,10 +437,19 @@ class MyReserveList(generic.ListView):
 
 @login_required
 def reserve_new(request, select_date=None, number=None):
-    # check reserve of exists
+    # check reserve of exists and ban
     check = logics.ReserveDuplicateCheck(request.user)
     if not check.is_availalble_reserve():
         user_message = check.get_duplicated_error_message()
+        redirect_url = reverse_lazy('my_page')
+        parameters = urlencode({'user_message': user_message})
+        url = f'{redirect_url}?{parameters}'
+        return redirect(url)
+
+    # check user is banned
+    ban_check = logics.UserBanCheck(request.user)
+    if ban_check.is_banned():
+        user_message = ban_check.get_user_banned_message()
         redirect_url = reverse_lazy('my_page')
         parameters = urlencode({'user_message': user_message})
         url = f'{redirect_url}?{parameters}'
