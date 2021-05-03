@@ -4,6 +4,8 @@ from django.core.mail import send_mail
 
 
 class ReserveDuplicateCheck:
+    """This class is responsible for checking reservation of user not to reserve multiplly
+    """
     def __init__(self, user):
         self.__user = user
 
@@ -21,6 +23,8 @@ class ReserveDuplicateCheck:
 
 
 class ReserveCalendar:
+    """This class is responsible for manuplating calendar logics
+    """
     def __init__(self, base_date):
         self.__base_date = base_date
         self.__calc_range_date()
@@ -87,6 +91,8 @@ class ReserveCalendar:
 
 
 class SendEmail:
+    """This class is responsible for send email to admins or user
+    """
     def __init__(self):
         admin_mails = CommonSetting.get_admin_mails()
         self.__admin_emails = [mail.strip() for mail in admin_mails.split(",")]
@@ -175,6 +181,8 @@ class SendEmail:
 
 
 class CommonSetting:
+    """This class is responsible for adding or updating common settings
+    """
     __send_from_mail_key = "send_from_mail"
     __admin_mails_key = "admin_mails"
     __reserve_complete_user_message_key = "reserve_complete_user_message"
