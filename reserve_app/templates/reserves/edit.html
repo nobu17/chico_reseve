@@ -1,0 +1,95 @@
+{% extends '../base.html' %} 
+{% block header %} 
+{% endblock header %}
+{% block content %}
+{% load widget_tweaks %}
+<h2 class="title has-text-centered">内容変更</h2>
+<p class="has-text-centered has-text-danger">氏名、連絡先、メールアドレス、備考のみ変更可能です。それ以外の内容はお手数ですがキャンセル後、再度予約をお願いします。</p>
+
+<form action="{% url 'reserve_edit' reserve_pk %}" method="POST">
+    {% csrf_token %}
+
+    <div class="field">
+        {{ form.number.label_tag }}
+        {{ form.number.as_hidden }}
+        <p>{{ form.number.value }}</p>
+        {% if form.number.error %}
+            <p class="help is-danger">{{ form.number.errors }}</p>
+        {% endif %}
+    </div>
+
+    <div class="field">
+        {{ form.start_date.label_tag }}
+        {{ form.start_date.as_hidden }}
+        <p>{{ form.start_date.value }}</p>
+        {% if form.start_date.error %}
+            <p class="help is-danger">{{ form.start_date.errors }}</p>
+        {% endif %}
+    </div>
+
+    <div class="field">
+        {{ form.selected_time.label_tag }}
+        {{ form.selected_time.as_hidden }}
+        <p>{{ form.selected_time.value }}</p>
+        {% if form.selected_time.error %}
+            <p class="help is-danger">{{ form.selected_time.errors }}</p>
+        {% endif %}
+    </div>
+
+    <div class="field">
+        {{ form.selected_seat.label_tag }}
+        {{ form.selected_seat.as_hidden }}
+        <p>{{ form.selected_seat_name }}</p>
+        {% if form.selected_seat.error %}
+            <p class="help is-danger">{{ form.selected_seat.errors }}</p>
+        {% endif %}
+    </div>
+
+    <div class="field">
+        {{ form.full_name.label_tag }} {{ form.full_name | add_class:'input' }} 
+        {% if form.full_name.help_text %}
+        <span class="help is-link">{{ form.full_name.help_text }}</span>
+        {% endif %} 
+        {% if form.full_name.error %}
+        <p class="help is-danger">{{ form.full_name.errors }}</p>
+        {% endif %}
+    </div>
+
+    <div class="field">
+        {{ form.tel.label_tag }} {{ form.tel | add_class:'input' }}
+        {% if form.tel.help_text %}
+        <span class="helptext">{{ form.tel.help_text }}</span>
+        {% endif %} {% if form.tel.error %}
+        <p class="help is-danger">{{ form.tel.errors }}</p>
+        {% endif %}
+    </div>
+
+    <div class="field">
+        {{ form.email.label_tag }} {{ form.email | add_class:'input' }}
+        {% if form.email.help_text %}
+        <span class="helptext">{{ form.email.help_text }}</span>
+        {% endif %} {% if form.email.error %}
+        <p class="help is-danger">{{ form.email.errors }}</p>
+        {% endif %}
+    </div>
+
+    <div class="field">
+        {{ form.memo.label_tag }} {{ form.memo | add_class:'input' }} 
+        {% if form.memo.help_text %}
+        <span class="help is-link">{{ form.memo.help_text }}</span>
+        {% endif %} {% if form.memo.error %}
+        <p class="help is-danger">{{ form.memo.errors }}</p>
+        {% endif %}
+    </div>
+
+    <div class="field is-grouped is-grouped-right">
+        <p class="control">
+            <input class="button is-info" type="submit" value="確定">
+        </p>
+        <p class="control">
+            <a class="button is-danger" href="{% url 'my_page' %}">キャンセル</a>
+        </p>
+    </div>
+</form>
+
+{% endblock content %}

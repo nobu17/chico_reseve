@@ -26,15 +26,6 @@
     {% endif %}
   </div>
 
-  {% comment %}
-  <div class="field">
-    {{ form.selected_time.label_tag }} {{ form.selected_time }} {% if
-    form.selected_time.error %}
-    <p class="help is-danger">{{ form.selected_time.errors }}</p>
-    {% endif %}
-  </div>
-  {% endcomment %}
-
   <div class="field">
     {{ form.selected_time.label_tag }}
     <p class="has-text-danger">※スマホ等の場合、横にスクロールできます。</p>
@@ -50,20 +41,6 @@
       {% endif %}
     </div>
   </div>
-
-
-  {% comment %} <div class="field">
-    {{ form.selected_seat.label_tag }}
-      {% for choice in form.selected_seat %} 
-      {{ choice.tag }}
-      <label for="{{ choice.id_for_label }}">
-        {{ choice.choice_label | linebreaksbr }}
-      </label>
-      {% endfor %} 
-      {% if form.selected_time.error %}
-      <p class="help is-danger">{{ form.selected_seat.errors }}</p>
-      {% endif %}
-  </div> {% endcomment %}
 
   <p>{{ form.selected_seat.label }}:</p>
   <p id="selected_set_error" class="has-text-danger"></p>

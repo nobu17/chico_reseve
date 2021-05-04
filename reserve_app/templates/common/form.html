@@ -1,18 +1,21 @@
 {% load widget_tweaks %}
 {% for field in form %}
-    <div class="field">
-        {{ field.label_tag }}
-        {% if only_displays and field.name in only_displays %}
-            {{ field.as_hidden }}
-            <p>{{ field.value }}</p>
-        {% else %}
-            {{ field | add_class:'input' }}
-        {% endif %}
-        {% if field.help_text %}
-            <span class="help is-link">{{ field.help_text }}</span>
-        {% endif %}
-        {% if field.error %}
-            <p class="help is-danger">{{ field.errors }}</p>
-        {% endif %}
-    </div>
+    {% if not_targets and field.name in not_targets %}
+    {% else %}
+        <div class="field">
+            {{ field.label_tag }}
+            {% if only_displays and field.name in only_displays %}
+                {{ field.as_hidden }}
+                <p>{{ field.value }}</p>
+            {% else %}
+                {{ field | add_class:'input' }}
+            {% endif %}
+            {% if field.help_text %}
+                <span class="help is-link">{{ field.help_text }}</span>
+            {% endif %}
+            {% if field.error %}
+                <p class="help is-danger">{{ field.errors }}</p>
+            {% endif %}
+        </div>
+    {% endif %}
 {% endfor %}

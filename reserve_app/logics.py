@@ -187,6 +187,30 @@ class SendEmail:
         # send to admin
         self.__send_email(subject, message, self.__from_email, self.__admin_emails)
 
+    def send_update_completed(self, reserve_model):
+        """
+        send email about update is completed to user
+        send email about update is added to admin
+        """
+        if (reserve_model is None):
+            raise Exception("reserve model error")
+
+        subject = "予約情報更新しました。(CHICO★SPICE)"
+        message = "CHICO★SPICEの店舗予約の情報更新が完了しました。\n"
+        message += "予約内容は以下の通りです。\n\n\n"
+        message = self.__create_reserve_common_message_for_user(message, reserve_model)
+        message += CommonSetting.get_reserve_complete_user_message()
+        # send to user
+        self.__send_email(subject, message, self.__from_email, [reserve_model.email])
+
+        # send to admins
+        subject = "予約情報更新通知"
+        message = "予約情報が更新されました。\n"
+        message += "予約内容は以下の通りです。\n\n\n"
+        message = self.__create_reserve_common_message_for_admin(message, reserve_model)
+        # send to admin
+        self.__send_email(subject, message, self.__from_email, self.__admin_emails)
+
     def __send_email(self, subject, message, from_email, to_emails):
         try:
             send_mail(subject, message, from_email, to_emails)

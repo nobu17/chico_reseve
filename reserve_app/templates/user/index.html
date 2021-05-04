@@ -30,7 +30,10 @@
       {{ reserve.memo }}
     </p>
     <p class="panel-block">
-      <a class="button is-danger is-fullwidth" href="{% url 'reserve_cancel' reserve.pk %}">キャンセルする</a>
+      <a class="button is-success is-fullwidth" href="{% url 'reserve_edit' reserve.pk %}">内容変更</a>
+    </p>
+    <p class="panel-block">
+      <a class="button is-danger is-fullwidth" href="{% url 'reserve_cancel' reserve.pk %}">キャンセル</a>
     </p>
   </article>
   {% endfor %}

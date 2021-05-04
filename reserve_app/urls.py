@@ -35,6 +35,7 @@ urlpatterns = [
     path('reserve/<date:select_date>', views.reserve_new, name='reserve'),
     path('reserve/<date:select_date>/<int:number>', views.reserve_new, name='reserve'),
     path('reserve/create/', views.create_new, name='reserve_create'),
+    path('reserve/edit/<int:reserve_pk>', views.reserve_edit, name='reserve_edit'),
     path('reserve/cancel/<int:reserve_pk>', views.reserve_cancel, name='reserve_cancel'),
     path('admin/reserve_calendar/', views.AdminReserveCalendar.as_view(), name='admin_reserve_calendar'),
     path('admin/reserve_calendar/<date:select_date>', views.AdminReserveCalendar.as_view(), name='admin_reserve_calendar'),

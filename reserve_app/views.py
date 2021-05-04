@@ -532,7 +532,7 @@ def reserve_cancel(request, reserve_pk=None):
     if request.method == "GET":
         try:
             form = forms.ReserveConfirmForm()
-            form.load_for_cancel(request.user, reserve_pk)
+            form.load_for_user(request.user, reserve_pk)
         except Exception:
             user_message = "想定外のエラーが発生しました。"
             redirect_url = reverse_lazy('my_page')
@@ -557,6 +557,41 @@ def reserve_cancel(request, reserve_pk=None):
             return redirect(url)
 
     return render(request, 'reserves/cancel.html', {'form': form, 'reserve_pk': reserve_pk})
+
+
+@login_required
+def reserve_edit(request, reserve_pk=None):
+    if reserve_pk is None:
+        return redirect(reverse_lazy('my_page'))
+    if request.method == "GET":
+        try:
+            form = forms.ReserveConfirmForm()
+            form.load_for_user(request.user, reserve_pk)
+            print("form is loaded!!!!")
+        except Exception:
+            user_message = "想定外のエラーが発生しました。"
+            redirect_url = reverse_lazy('my_page')
+            parameters = urlencode({'user_message': user_message})
+            url = f'{redirect_url}?{parameters}'
+            return redirect(url)
+    elif request.method == "POST":
+        form = forms.ReserveConfirmForm(request.POST)
+        if form.is_valid():
+            user_message = ""
+            try:
+                reserve = form.update(request.user, reserve_pk)
+                send_mail = logics.SendEmail()
+                send_mail.send_update_completed(reserve)
+                user_message = "変更が完了しました。"
+            except Exception as e:
+                user_message = e
+
+            redirect_url = reverse_lazy('my_page')
+            parameters = urlencode({'user_message': user_message})
+            url = f'{redirect_url}?{parameters}'
+            return redirect(url)
+
+    return render(request, 'reserves/edit.html', {'form': form, 'reserve_pk': reserve_pk})
 
 
 class ReserveCalcLogic:
