@@ -161,7 +161,8 @@ class SeatModel(models.Model):
         return self.max_count_of_one_reserve * self.capacity
 
     def get_use_seat_count(self, reserve_number):
-        return reserve_number // self.capacity
+        # round up is needed
+        return -(-reserve_number // self.capacity)
 
 
 class ReserveModel(models.Model):
