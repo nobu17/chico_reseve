@@ -181,6 +181,9 @@ SOCIALACCOUNT_PROVIDERS = {
     },
     'facebook': {
         'SCOPE': ['email', 'public_profile'],
+    },
+    'line': {
+        'SCOPE': ['profile', 'openid', 'email'],
     }
 }
 

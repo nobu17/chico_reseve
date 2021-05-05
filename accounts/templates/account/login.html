@@ -60,7 +60,14 @@
   </form>
 {% else %}
 <!-- user login -->
-<p class="has-text-centered has-text-danger m-3">下記のいずれかのアカウントでログインをお願いします。</br>お持ちでない方はお手数ですが取得後再度ログインをお願いいたします。</p>
+<p class="has-text-centered has-text-danger is-size-7 m-3">下記のいずれかのアカウントでログインをお願いします。</br>お持ちでない方はお手数ですが取得後再度ログインをお願いいたします。</p>
+<p class="has-text-centered m-3 is-size-7">
+※本Webサービスでは、ログイン時の認証画面にて許可を頂いた場合のみ、あなたのSocialアカウントに登録されているメールアドレスを取得します。
+<br/>取得したメールアドレスは、以下の目的以外では使用いたしません。また、法令に定められた場合を除き、第三者への提供はいたしません。</p>
+<ul class="has-text-centered m-3 is-size-7">
+    <li class="is-size-7">１：ユーザーIDとしてアカウントの管理に利用</li>
+    <li class="is-size-7">２：予約完了、キャンセル時の通知に利用</li>
+</ul>
 {% get_providers as socialaccount_providers %}
 
 {% if socialaccount_providers %}
