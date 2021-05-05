@@ -60,8 +60,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.twitter',
-    'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.instagram',
+    # 'allauth.socialaccount.providers.google',
+    # 'allauth.socialaccount.providers.instagram',
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.line',
 
@@ -170,15 +170,15 @@ ACCOUNT_EMAIL_REQUIRED = True
 
 # social
 SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        }
-    },
+    # 'google': {
+    #    'SCOPE': [
+    #        'profile',
+    #        'email',
+    #    ],
+    #    'AUTH_PARAMS': {
+    #        'access_type': 'online',
+    #    }
+    # },
     'facebook': {
         'SCOPE': ['email', 'public_profile'],
     },
