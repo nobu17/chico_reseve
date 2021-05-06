@@ -21,8 +21,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('reserve_app.urls')),
     # path('accounts/login/', login, name='account_login'),
-    # path('accounts/logout/', logout, name='account_logout'),  
-    # path('accounts/signup/', login, name='account_signup'),  
+    # path('accounts/logout/', logout, name='account_logout'),
+    # path('accounts/signup/', login, name='account_signup'),
     path('accounts/', include('allauth.urls')),
     path('accounts/admin_login/', login, name='admin_login'),
 ]

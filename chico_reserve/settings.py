@@ -158,6 +158,9 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
+SOCIALACCOUNT_FORMS = {
+    'signup': 'accounts.forms.CustomSignupForm'
+}
 # ログイン・ログアウト時のリダイレクト先
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login'
