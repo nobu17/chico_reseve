@@ -1,6 +1,8 @@
 from . import const
 from . import models
 from . import util
+import locale
+import datetime
 from django.core.mail import send_mail
 
 
@@ -291,3 +293,225 @@ class CommonSetting:
         if result is None:
             return default_value
         return result.value
+
+
+class ReserveCalcLogic:
+    """
+    calcurating the resevation core logic (remain seat info and king, availalble time to reserve)
+    """
+
+    def __init__(self, select_date, reserve_number, max_days, duration_minutes, is_admin):
+        self.__reserve_number = reserve_number
+        self.__max_days = max_days
+        self.__duration_minutes = duration_minutes
+        # if seelct_date is none set tomorrow and then it is checked by calc_select_dates methods
+        # admin can reserve today
+        start_offset_days = 0 if is_admin else const.OFFSET_DAYS_START_RESERVE
+        self.__select_date = util.DateUtil.get_date(select_date, self.__max_days, start_offset_days)
+        self.__is_admin = is_admin
+
+    def calc_info(self):
+        """
+        calculating selectable dates, times, seats
+        """
+        self._calc_select_dates()
+        self._calc_reserve_time_list()
+        self._calc_seat_remain()
+
+    def _calc_select_dates(self):
+        """
+        set availalbe dates of reserve
+        """
+        select_dates = []
+        # get reservable all days from current date + offset (day) (not using selected_date)
+        # admin can reserve today
+        start_offset_days = 0 if self.__is_admin else const.OFFSET_DAYS_START_RESERVE
+        base_date = datetime.datetime.now().date() + datetime.timedelta(days=start_offset_days)
+        all_days = util.DateUtil.get_ranges(base_date, self.__max_days)
+        # filter actual days by available schedules
+        all_days = models.WeeklyScheduleModel.get_filtered_date_by_availalble_dayofweeks(all_days)
+        # filter special holiday
+        all_days = models.SpecialHolydayModel.get_filtered_day(all_days)
+        for dt in all_days:
+            select_dates.append(dt)
+
+        self.__select_dates = select_dates
+        # select_date is setted without selectable at init, so if it is not match list, select again
+        if (self.__select_date not in self.__select_dates) and (len(self.__select_dates) > 0):
+            self.__select_date = self.__select_dates[0]
+
+    def get_select_date(self):
+        return self.__select_date
+
+    def get_select_dates_choices(self):
+        # locale.setlocale(locale.LC_ALL, '')
+        locale.setlocale(locale.LC_TIME, 'ja_JP.UTF-8')
+        choices = []
+        for dt in self.__select_dates:
+            frm = dt.strftime('%Y/%m/%d (%A)')
+            choices.append((dt, frm))
+        return choices
+
+    def _calc_reserve_time_list(self):
+        """
+        set availalble times of resereve from store's schedule
+        """
+        # week_of_day = 1
+        week_of_day = self.__select_date.weekday()
+        self.__reserve_time_list = []
+        # get available time schedules by selected date' dayofweek
+        schedules = models.WeeklyScheduleModel.get_by_dayofweek(week_of_day)
+        # divide the schedule by segument of time
+        for schedule in schedules:
+            # actual end_time is needed to concern offsets
+            end_time = util.TimeUtil.add_minutes(schedule.end_time, -const.RESERVE_MINUTES_OFFSET)
+            time_results = util.TimeUtil.get_ranges(schedule.start_time, end_time, self.__duration_minutes)
+            for time_result in time_results:
+                self.__reserve_time_list.append(time_result)
+                # self.__reserve_time_list.append((time_result, time_result.strftime('%H:%M')))
+
+    def get_reserve_time_list_choices(self):
+        """
+        get availalble times of resereve with seat reservable status
+        """
+        choices = []
+        all_seat_status = self.get_all_seat_states()
+        for time_result in self.__reserve_time_list:
+            frm = time_result.strftime('%H:%M')
+            # get seat stutas
+            can_reserve = all_seat_status[frm]["can_reserve"]
+            if can_reserve:
+                frm += '\n○'
+            else:
+                frm += '\n×'
+
+            choices.append((time_result, frm))
+        return choices
+
+    def get_all_seats_for_choice(self):
+        selectable_seats = []
+        all_seats = models.SeatModel.get_all()
+        for seat in all_seats:
+            selectable_seats.append((seat.pk, seat.name))
+        return selectable_seats
+
+    def get_all_seats_info(self):
+        selectable_seats = {}
+        all_seats = models.SeatModel.get_all()
+        for seat in all_seats:
+            selectable_seats[seat.pk] = {"name": seat.name, "memo": seat.memo}
+        return selectable_seats
+
+    def _calc_seat_remain(self):
+        self.__seat_remain_info = []
+        # get seat infomation
+        seats = models.SeatModel.get_all()
+        # ToDo:need to concern no seats case
+        # create a remain model
+        for time in self.__reserve_time_list:
+            self.__seat_remain_info.append(SeatRemainInformation(time, self.__duration_minutes, seats))
+
+        print('before seatinfo')
+        self.print_test()
+
+        # get reserves and calc reamin seat number
+        reserves = models.ReserveModel.get_by_date(self.__select_date)
+        for reserve in reserves:
+            for remain in self.__seat_remain_info:
+                # decreasing seat count if match the time
+                remain.decrease_seat_remain(reserve)
+
+        print('after seatinfo')
+        self.print_test()
+
+        # set seat_state by reserve number
+        for seat in self.__seat_remain_info:
+            seat.set_state_by_reserve_number(self.__reserve_number)
+
+    def get_seat_remain_info(self):
+        return self.__seat_remain_info
+
+    def print_test(self):
+        for seat in self.__seat_remain_info:
+            print(seat)
+
+    def get_all_seat_states(self):
+        result = {}
+        for seat in self.__seat_remain_info:
+            # seat.set_state_by_reserve_number(self.__reserve_number)
+            temp = seat.get_seat_state(self.__reserve_number)
+            # key:starttime, value: {seatstate}
+            result[temp[0]] = temp[1]
+
+        return result
+
+    def check_availalbe_reserve(self, start_time):
+        # check select date reserve condition
+        seat_states = self.get_all_seat_states()
+        return seat_states[start_time.strftime('%H:%M')]
+
+
+class SeatRemainInformation:
+    # seat stock is keyvalye (key;seatid, value:amount of stock)
+    def __init__(self, start_time, duration_minutes, seats):
+        self.start_time = start_time
+        self.duration_minutes = duration_minutes
+        self.end_time = util.TimeUtil.add_minutes(start_time, duration_minutes)
+        self.seats = seats
+        self.disabled_seats_ids = []
+        # init seat remains
+        self.seat_remains = {}
+        for seat in seats:
+            self.seat_remains[seat.pk] = {'seat_count': seat.count, 'seat_capacity': seat.capacity}
+
+    def decrease_seat_remain(self, reserve_data):
+        # define end time form reservation start time
+        reserve_end_time = util.TimeUtil.add_minutes(reserve_data.start_time, const.RESERVE_MINUTES_OFFSET)
+        # if reservation is match the time, decreasing the specified seat number
+        if self.start_time >= reserve_data.start_time and reserve_end_time >= self.end_time:
+            self.seat_remains[reserve_data.seat.pk]['seat_count'] -= reserve_data.seat_used_number
+
+    def set_state_by_reserve_number(self, reserve_number):
+        self.disabled_seats_ids = []
+        # min check
+        for seat in self.seats:
+            # check min requirement
+            if seat.minnum > reserve_number:
+                self.disabled_seats_ids.append(seat.pk)
+            # check max availalbe
+            elif seat.get_max_number_of_one_reserve() < reserve_number:
+                self.disabled_seats_ids.append(seat.pk)
+
+    # get seat state (key:start_time, value{can_reserve:Bool, seat_status:{pk, Bool}})
+    def get_seat_state(self, reserve_number):
+        result = {}
+        print("disabled_seats_ids", self.disabled_seats_ids)
+        for pk, info in self.seat_remains.items():
+            # if disabled always False
+            if pk in self.disabled_seats_ids:
+                result[pk] = False
+            # if over seat capacity is over reserve, available to be reserve
+            elif (((info['seat_capacity'] * info['seat_count']) - reserve_number) >= 0):
+                result[pk] = True
+            else:
+                result[pk] = False
+
+        all_seat_state = False
+        for _, seat_state in result.items():
+            if seat_state:
+                all_seat_state = True
+
+        summary = {
+            'can_reserve': all_seat_state,
+            'seat_status': result
+        }
+
+        return (self.start_time.strftime('%H:%M'), summary)
+
+    def __str__(self):
+        temp = "start_time:" + self.start_time.strftime('%H:%M') + ' '
+
+        for k, v in self.seat_remains.items():
+            temp += "Seat" + str(k) + ":" + str(v) + ' '
+
+        return temp
