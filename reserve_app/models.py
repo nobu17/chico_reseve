@@ -183,9 +183,10 @@ class ReserveModel(models.Model):
     def can_cancel(self):
         if self.canceled:
             return False
-        now = datetime.datetime.now()
-        model_date = util.DateTimeUtil.get_datetime(self.start_date, self.start_time)
-        return now <= model_date
+        # now = datetime.datetime.now()
+        # model_date = util.DateTimeUtil.get_datetime(self.start_date, self.start_time)
+        # return now <= model_date
+        return True
 
     @classmethod
     def get_by_pk(cls, reserve_pk):
