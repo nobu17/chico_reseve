@@ -50,12 +50,6 @@
     マイメニュー
   </p>
   <ul class="menu-list">
-    <a href="{% url 'reserve' %}">
-      <span class="icon">
-        <i class="far fa-caret-right"></i>
-      </span>
-      予約する(TestMode)
-      </a>
     {% if not reserves %}
       <a href="{% url 'reserve' %}">
       <span class="icon">
