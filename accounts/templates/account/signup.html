@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block active_signup %}active{% endblock %}
+{% block content %}
+{% include '../common/form_error.html' %}
+
+<h2 class="title has-text-centered m-3">サインアップ</h2>
+
+<p class="has-text-centered has-text-danger">ユーザー登録のために、以下のフォームに記入してください。</p>
+
+<form method="post" action="{% url 'account_signup' %}">
+    {% csrf_token %}
+    {% include '../common/form.html' %}
+
+    {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+
+    <div class="field is-grouped is-grouped-right">
+        <p class="control">
+            <input class="button is-info" type="submit" value="登録">
+        </p>
+    </div>
+</form>
+
+{% endblock %}

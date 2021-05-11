@@ -1,0 +1,7 @@
+{% extends "account/email/base_message.txt" %}
+
+{% block content %}
+CHICO★SPICEの予約ページご登録ありがとうございます。
+登録を続けるには、以下のリンクをクリックしてください。
+{{ activate_url }}
+{% endblock %}

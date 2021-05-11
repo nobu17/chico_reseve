@@ -1,0 +1,12 @@
+{% block content %}
+
+{% endblock %}
+
+※本メールは送信専用アドレスから送信しています。
+返信に関してはお答えできませんので、下記の問い合わせフォームからご連絡ください。
+
+※本メールに心当たりが無い方は、お手数ですが下記URLからご連絡をお願いいたします。
+{{ request.scheme }}://{{ request.get_host }}{% url 'contact' %}
+
+CHICO★SPICE予約サイト
+{{ request.scheme }}://{{ request.get_host }}{% url 'index' %}

@@ -3,11 +3,11 @@
 {% load i18n %}
 {% load account socialaccount %}
 
-{% block head_title %}{% trans "Sign In" %}{% endblock %}
+{% block active_login %}active{% endblock %}
 
 {% block content %}
 {% load widget_tweaks %}
-<h2 class="title has-text-centered">{% trans "Sign In" %}</h2>
+<h2 class="subtitle has-text-centered">{% trans "Sign In" %}</h2>
 
 {% include '../common/form_error.html' %}
 
@@ -60,14 +60,56 @@
   </form>
 {% else %}
 <!-- user login -->
-<p class="has-text-centered has-text-danger is-size-7 m-3">下記のいずれかのアカウントでログインをお願いします。</br>お持ちでない方はお手数ですが取得後再度ログインをお願いいたします。</p>
-<p class="has-text-centered m-3 is-size-7">
-※本Webサービスでは、ログイン時の認証画面にて許可を頂いた場合のみ、あなたのSocialアカウントに登録されているメールアドレスを取得します。
-<br/>取得したメールアドレスは、以下の目的以外では使用いたしません。また、法令に定められた場合を除き、第三者への提供はいたしません。</p>
-<ul class="has-text-centered m-3 is-size-7">
-    <li class="is-size-7">１：ユーザーIDとしてアカウントの管理に利用</li>
-    <li class="is-size-7">２：予約完了、キャンセル時の通知に利用</li>
-</ul>
+<form method="post" action="{% url 'account_login' %}">
+    {% csrf_token %}
+
+    <div class="field">
+        {{ form.login.label_tag }}
+        {{ form.login | add_class:'input' }}
+        {% if form.login.help_text %}
+            <span class="helptext">{{ form.login.help_text }}</span>
+        {% endif %}
+        {% if form.login.error %}
+            <p class="help is-danger">{{ form.login.errors }}</p>
+        {% endif %}
+    </div>
+    <div class="field">
+        {{ form.password.label_tag }}
+        {{ form.password | add_class:'input' }}
+        {% if form.password.help_text %}
+            <span class="helptext">{{ form.password.help_text }}</span>
+        {% endif %}
+        {% if form.password.error %}
+            <p class="help is-danger">{{ form.password.errors }}</p>
+        {% endif %}
+    </div>
+    <div class="field">
+        {{ form.remember | add_class:'is-checkradio is-medium is-danger' }}
+        {{ form.remember.label_tag }}
+        {% if form.remember.help_text %}
+            <span class="helptext">{{ form.remember.help_text }}</span>
+        {% endif %}
+        {% if form.remember.error %}
+            <p class="help is-danger">{{ form.remember.errors }}</p>
+        {% endif %}
+    </div>
+
+    {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+
+    <div class="field is-grouped">
+      <button class="button is-info is-fullwidth" type="submit">{% trans "Sign In" %}</button>
+    </div>
+    <p class="has-text-left mb-5 is-size-7">パスワードを忘れた場合は
+      <a class="is-size-6" href="{% url 'account_reset_password' %}">こちら</a>
+    </p>
+</form>
+
+<a class="button is-danger is-fullwidth" href="{% url 'account_signup' %}">新規会員登録</a>
+
+<p class="has-text-centered has-text-danger is-size-6 m-3">下記のアカウントでログインも可能です。</p>
+
 {% get_providers as socialaccount_providers %}
 
 {% if socialaccount_providers %}
@@ -82,6 +124,14 @@
 </div>
 
 {% include "socialaccount/snippets/login_extra.html" %}
+
+<p class="has-text-centered m-3 is-size-7">
+※本Webサービスでは、ログイン時の認証画面にて許可を頂いた場合のみ、あなたのSocialアカウントに登録されているメールアドレスを取得します。
+<br/>取得したメールアドレスは、以下の目的以外では使用いたしません。また、法令に定められた場合を除き、第三者への提供はいたしません。</p>
+<ul class="has-text-centered m-3 is-size-7">
+    <li class="is-size-7">１：ユーザーIDとしてアカウントの管理に利用</li>
+    <li class="is-size-7">２：予約完了、キャンセル時の通知に利用</li>
+</ul>
 
 {% endif %}
 

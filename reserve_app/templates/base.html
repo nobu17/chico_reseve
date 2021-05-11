@@ -61,12 +61,14 @@
           </span>
           <span>Home</span>
         </a>
+        {% if user.is_authenticated %}
         <a class="navbar-item" href="{% url 'my_page' %}">
           <span class="icon">
             <i class="far fa-user"></i>
           </span>
           <span>MyPage</span>
         </a>
+        {% endif %}
         {% if user.is_authenticated and user.is_superuser %}
         <a class="navbar-item" href="{% url 'user_admin' %}">
           <span class="icon">
@@ -83,14 +85,18 @@
           <span>Logout</span>
         </a>
         {% else %}
-        {% comment %} 
         <a class="navbar-item" href="{% url 'account_login' %}">
           <span class="icon">
             <i class="fas fa-lock"></i>
           </span>
           <span>Login</span>
         </a>
-        {% endcomment %}
+        <a class="navbar-item" href="{% url 'account_signup' %}">
+          <span class="icon">
+            <i class="far fa-bolt"></i>
+          </span>
+          <span>SignUp</span>
+        </a>
         {% endif %}
         <a class="navbar-item" href="{% url 'contact' %}">
           <span class="icon">
