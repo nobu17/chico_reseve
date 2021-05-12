@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% include '../common/form_error.html' %}
+
+<h2 class="title has-text-centered m-3">ログインキャンセル</h2>
+{% url 'account_login' as login_url %}
+<p class="has-text-centered">既存の外部アカウントを使ったログインはキャンセルされました。 やり直される場合は<a href="{{login_url}}">ログインページ</a>から再度ログインをお願いします。</p>
+
+{% endblock %}
+
