@@ -3,3 +3,11 @@ python manage.py runserver
 # migration
 python manage.py makemigrations
 python manage.py migrate
+
+
+cd myapp1
+source bin/activate
+# create init admin
+python manage.py createsuperuser
+# clear tables
+python manage.py flush
