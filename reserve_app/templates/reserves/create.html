@@ -107,6 +107,7 @@
 <script>
   let seatJson = {{seat_json | safe}}
   let seatInfoJson = {{seat_info_json | safe}}
+  const user_key = "{{user.id | safe}}"
 
   function inputChange(obj) {
     let number = document.getElementById("id_number").value;
@@ -118,25 +119,24 @@
   }
 
   function saveInfo() {
-    console.log("save info");
     let name = document.getElementById("id_full_name").value;
     let tel = document.getElementById("id_tel").value;
     let memo = document.getElementById("id_memo").value;
-    localStorage.setItem("name", name);
-    localStorage.setItem("tel", tel);
-    localStorage.setItem("memo", memo);
+    localStorage.setItem(user_key + "_name", name);
+    localStorage.setItem(user_key + "_tel", tel);
+    localStorage.setItem(user_key + "_memo", memo);
     return true;
   }
 
   function loadInfo() {
-    let nameValue = localStorage.getItem("name");
-    let telValue = localStorage.getItem("tel");
-    let memoValue = localStorage.getItem("memo");
+    let nameValue = localStorage.getItem(user_key + "_name");
+    let telValue = localStorage.getItem(user_key + "_tel");
+    let memoValue = localStorage.getItem(user_key + "_memo");
     let form_name = document.getElementById("id_full_name");
     let form_tel = document.getElementById("id_tel");
     let form_memo = document.getElementById("id_memo");
 
-    // only when empoty value case, set stored value
+    // only when empty value case, set stored value
     if (nameValue && form_name && !form_name.value) {
       form_name.value = nameValue;
     } 
