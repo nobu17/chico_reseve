@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.views import generic
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.db import connection, transaction
+from django.db import transaction
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
@@ -59,14 +59,9 @@ class UserAdminDebug(generic.TemplateView):
 
     def get(self, request, **kwargs):
         mode = self.kwargs.get('mode', '')
-        if mode == "delete_reserve":
-            cursor = connection.cursor()
-            cursor.execute("TRUNCATE TABLE `reserve_app_reservemodel`")
+        debug = logics.DebugData(mode)
+        if debug.do_task():
             messages.success(self.request, "削除に成功しました。")
-        elif mode == "delete_user":
-            models.CustomUser.clear_without_admin()
-            messages.success(self.request, "削除に成功しました。")
-
         context = {}
         return self.render_to_response(context)
 

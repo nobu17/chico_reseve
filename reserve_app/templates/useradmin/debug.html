@@ -16,6 +16,15 @@
 
 <div class="columns">
     <div class="column m-3">
+        <a class="button is-danger is-fullwidth" href="{% url 'user_admin_debug' 'init_store_schedule' %}" href="" onclick="return confirm('本当に実施してもよろしいですか？')">営業時間初期化</a>
+    </div>
+    <div class="column m-3">
+        <a class="button is-danger is-fullwidth" href="{% url 'user_admin_debug' 'init_seat_and_reserve' %}" href="" onclick="return confirm('本当に実施してもよろしいですか？')">座席情報初期化(+予約データ)</a>
+    </div>
+</div>
+
+<div class="columns">
+    <div class="column m-3">
         <a class="button is-info is-fullwidth" href="{% url 'user_admin' %}">戻る</a>
     </div>
 </div>

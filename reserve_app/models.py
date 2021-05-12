@@ -111,6 +111,21 @@ class WeeklyScheduleModel(models.Model):
 
         return result
 
+    @classmethod
+    def create_init_data(cls):
+        WeeklyScheduleModel(dayofweek=SUN_DAY, start_time=datetime.time(7, 00, 00), end_time=datetime.time(9, 30, 00)).save()
+        WeeklyScheduleModel(dayofweek=SUN_DAY, start_time=datetime.time(11, 30, 00), end_time=datetime.time(15, 00, 00)).save()
+        WeeklyScheduleModel(dayofweek=MON_DAY, start_time=datetime.time(11, 30, 00), end_time=datetime.time(15, 00, 00)).save()
+        WeeklyScheduleModel(dayofweek=TUES_DAY, start_time=datetime.time(7, 00, 00), end_time=datetime.time(9, 30, 00)).save()
+        WeeklyScheduleModel(dayofweek=TUES_DAY, start_time=datetime.time(11, 30, 00), end_time=datetime.time(15, 00, 00)).save()
+        WeeklyScheduleModel(dayofweek=WEDNES_DAY, start_time=datetime.time(7, 00, 00), end_time=datetime.time(9, 30, 00)).save()
+        WeeklyScheduleModel(dayofweek=WEDNES_DAY, start_time=datetime.time(11, 30, 00), end_time=datetime.time(15, 00, 00)).save()
+        WeeklyScheduleModel(dayofweek=FRI_DAY, start_time=datetime.time(11, 30, 00), end_time=datetime.time(15, 00, 00)).save()
+        WeeklyScheduleModel(dayofweek=FRI_DAY, start_time=datetime.time(17, 30, 00), end_time=datetime.time(21, 00, 00)).save()
+        WeeklyScheduleModel(dayofweek=SATUR_DAY, start_time=datetime.time(7, 00, 00), end_time=datetime.time(9, 30, 00)).save()
+        WeeklyScheduleModel(dayofweek=SATUR_DAY, start_time=datetime.time(11, 30, 00), end_time=datetime.time(15, 00, 00)).save()
+        WeeklyScheduleModel(dayofweek=SATUR_DAY, start_time=datetime.time(17, 30, 00), end_time=datetime.time(21, 00, 00)).save()
+
 
 class SpecialHolydayModel(models.Model):
     start_date = models.DateField()
@@ -163,6 +178,12 @@ class SeatModel(models.Model):
     def get_use_seat_count(self, reserve_number):
         # round up is needed
         return -(-reserve_number // self.capacity)
+
+    @classmethod
+    def create_init_data(cls):
+        SeatModel(name="カウンター席", memo="1人がけの席です。", capacity=1, minnum=1, count=6, max_count_of_one_reserve=6).save()
+        SeatModel(name="テーブル席", memo="２人がけの席です。", capacity=2, minnum=2, count=2, max_count_of_one_reserve=1).save()
+        SeatModel(name="テーブル席", memo="3~4人がけの席です。", capacity=4, minnum=3, count=1, max_count_of_one_reserve=1).save()
 
 
 class ReserveModel(models.Model):

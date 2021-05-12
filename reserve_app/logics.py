@@ -3,6 +3,7 @@ from . import models
 from . import util
 import locale
 import datetime
+from django.db import connection
 from django.core.mail import send_mail
 
 
@@ -515,3 +516,35 @@ class SeatRemainInformation:
             temp += "Seat" + str(k) + ":" + str(v) + ' '
 
         return temp
+
+
+class DebugData:
+    def __init__(self, mode):
+        self._mode = mode
+
+    def do_task(self):
+        """clear reservation records
+        """
+        if self._mode == "delete_reserve":
+            cursor = connection.cursor()
+            cursor.execute("TRUNCATE TABLE `reserve_app_reservemodel`")
+            return True
+        elif self._mode == "delete_user":
+            models.CustomUser.clear_without_admin()
+            return True
+        elif self._mode == "init_store_schedule":
+            cursor = connection.cursor()
+            cursor.execute("TRUNCATE TABLE `reserve_app_weeklyschedulemodel`")
+            models.WeeklyScheduleModel.create_init_data()
+            return True
+        elif self._mode == "init_seat_and_reserve":
+            cursor = connection.cursor()
+            # at first clear reserve
+            cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
+            cursor.execute("TRUNCATE TABLE `reserve_app_reservemodel`")
+            cursor.execute("TRUNCATE TABLE `reserve_app_seatmodel`")
+            cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
+            models.SeatModel.create_init_data()
+            return True
+        else:
+            return False
