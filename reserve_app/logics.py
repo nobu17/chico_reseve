@@ -4,7 +4,7 @@ from . import util
 import locale
 import datetime
 from django.db import connection
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
 
 
 class ReserveDuplicateCheck:
@@ -139,8 +139,8 @@ class SendEmail:
 
     def __init__(self):
         admin_mails = CommonSetting.get_admin_mails()
-        self.__admin_emails = [mail.strip() for mail in admin_mails.split(",")]
-        self.__from_email = CommonSetting.get_send_from_mail()
+        self._admin_emails = [mail.strip() for mail in admin_mails.split(",")]
+        self._from_email = CommonSetting.get_send_from_mail()
 
     def send_reserve_complete(self, reserve_model):
         """
@@ -153,18 +153,10 @@ class SendEmail:
         subject = "予約完了しました。(CHICO★SPICE)"
         message = "CHICO★SPICEの店舗予約が完了しました。\n"
         message += "予約内容は以下の通りです。\n\n\n"
-        message = self.__create_reserve_common_message_for_user(message, reserve_model)
+        message = self._create_reserve_common_message_for_user(message, reserve_model)
         message += CommonSetting.get_reserve_complete_user_message()
         # send to user
-        self.__send_email(subject, message, self.__from_email, [reserve_model.email])
-
-        # send to admins
-        subject = "予約通知"
-        message = "新規予約が追加されました。\n"
-        message += "予約内容は以下の通りです。\n\n\n"
-        message = self.__create_reserve_common_message_for_admin(message, reserve_model)
-        # send to admin
-        self.__send_email(subject, message, self.__from_email, self.__admin_emails)
+        self._send_email(subject, message, self._from_email, [reserve_model.email], self._admin_emails)
 
     def send_cancel_completed(self, reserve_model):
         """
@@ -177,18 +169,9 @@ class SendEmail:
         subject = "予約をキャンセルしました。(CHICO★SPICE)"
         message = "CHICO★SPICEの店舗予約をキャンセルしました。\n"
         message += "キャンセル内容は以下の通りです。\n\n\n"
-        message = self.__create_reserve_common_message_for_user(message, reserve_model)
+        message = self._create_reserve_common_message_for_user(message, reserve_model)
         message += CommonSetting.get_reserve_cancel_user_message()
-        # send to user
-        self.__send_email(subject, message, self.__from_email, [reserve_model.email])
-
-        # send to admins
-        subject = "予約キャンセル通知"
-        message = "予約がキャンセルされました。\n"
-        message += "予約内容は以下の通りです。\n\n\n"
-        message = self.__create_reserve_common_message_for_admin(message, reserve_model)
-        # send to admin
-        self.__send_email(subject, message, self.__from_email, self.__admin_emails)
+        self._send_email(subject, message, self._from_email, [reserve_model.email], self._admin_emails)
 
     def send_update_completed(self, reserve_model):
         """
@@ -201,50 +184,24 @@ class SendEmail:
         subject = "予約情報更新しました。(CHICO★SPICE)"
         message = "CHICO★SPICEの店舗予約の情報更新が完了しました。\n"
         message += "予約内容は以下の通りです。\n\n\n"
-        message = self.__create_reserve_common_message_for_user(message, reserve_model)
+        message = self._create_reserve_common_message_for_user(message, reserve_model)
         message += CommonSetting.get_reserve_complete_user_message()
-        # send to user
-        self.__send_email(subject, message, self.__from_email, [reserve_model.email])
+        self._send_email(subject, message, self._from_email, [reserve_model.email], self._admin_emails)
 
-        # send to admins
-        subject = "予約情報更新通知"
-        message = "予約情報が更新されました。\n"
-        message += "予約内容は以下の通りです。\n\n\n"
-        message = self.__create_reserve_common_message_for_admin(message, reserve_model)
-        # send to admin
-        self.__send_email(subject, message, self.__from_email, self.__admin_emails)
-
-    def __send_email(self, subject, message, from_email, to_emails):
+    def _send_email(self, subject, message, from_email, to_emails, bcc):
         try:
-            send_mail(subject, message, from_email, to_emails)
+            email = EmailMessage(subject, message, from_email, to_emails, bcc)
+            email.send()
         except Exception as e:
             print("mail send failed:", e)
 
-    def __create_reserve_common_message_for_user(self, message, reserve_model):
+    def _create_reserve_common_message_for_user(self, message, reserve_model):
         message += "○予約日時\n"
         message += f"{util.DateTimeUtil.get_str(reserve_model.start_date, reserve_model.start_time)}\n\n"
         message += "○予約人数\n"
         message += f"{reserve_model.number} 名\n\n"
         message += "○席\n"
         message += f"{reserve_model.seat.name}\n\n"
-        return message
-
-    def __create_common_inquire_message(self, message):
-        message += "本メールは送信専用です。"
-        return message
-
-    def __create_reserve_common_message_for_admin(self, message, reserve_model):
-        message += "○予約日時\n"
-        message += f"{util.DateTimeUtil.get_str(reserve_model.start_date, reserve_model.start_time)}\n\n"
-        message += "○予約人数\n"
-        message += f"{reserve_model.number} 名\n\n"
-        message += "○席\n"
-        message += f"{reserve_model.seat.name}\n\n"
-        message += "○ユーザー名\n"
-        message += f"{reserve_model.full_name}\n\n"
-        message += "○連絡先\n"
-        message += f"{reserve_model.tel}\n"
-        message += f"{reserve_model.email}\n\n"
         return message
 
 
