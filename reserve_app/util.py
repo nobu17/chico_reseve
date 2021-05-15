@@ -158,3 +158,14 @@ class NumberUtil:
             return default
 
         return number
+
+
+class ListUtil:
+    @staticmethod
+    def list_difference(list1, list2):
+        result = list1.copy()
+        for value in list2:
+            if value in result:
+                result.remove(value)
+
+        return result

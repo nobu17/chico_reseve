@@ -471,16 +471,19 @@ def reserve_new(request, select_date=None, number=None):
     if errors:
         form._errors = errors
 
-    form.init_field(number, logic.get_select_date(), logic.get_select_dates_choices(), logic.get_reserve_time_list_choices(), logic.get_all_seats_for_choice())
+    form.init_field(number, logic.get_select_date(), logic.get_reserve_time_list_choices(), logic.get_all_seats_for_choice())
     form.load_userinfo(request.user.pk)
     # calc remain serat number
     seat_json = json.dumps(logic.get_all_seat_states())
     seat_info_json = json.dumps(logic.get_all_seats_info())
+    # disabled_dates_json = json.dumps(logic.get_disabled_select_date(), cls=encode.ModelEncoder)
+    # selectable_dates = logic.get_select_dates()
+    selectable_dates_json = json.dumps(logic.get_select_dates(), cls=encode.ModelEncoder)
 
-    return render(request, 'reserves/create.html', {'form': form, 'seat_json': seat_json, 'seat_info_json': seat_info_json})
+    return render(request, 'reserves/create.html', {'form': form, 'seat_json': seat_json, 'seat_info_json': seat_info_json, 'selectable_dates_json': selectable_dates_json})
 
 
-@login_required
+@ login_required
 def create_new(request):
     if request.method == "POST":
         form = forms.ReserveConfirmForm(request.POST)
@@ -514,7 +517,7 @@ def create_new(request):
     return redirect(url)
 
 
-@login_required
+@ login_required
 def reserve_cancel(request, reserve_pk=None):
     if reserve_pk is None:
         return redirect(reverse_lazy('my_page'))
@@ -549,7 +552,7 @@ def reserve_cancel(request, reserve_pk=None):
     return render(request, 'reserves/cancel.html', {'form': form, 'reserve_pk': reserve_pk})
 
 
-@login_required
+@ login_required
 def reserve_edit(request, reserve_pk=None):
     if reserve_pk is None:
         return redirect(reverse_lazy('my_page'))

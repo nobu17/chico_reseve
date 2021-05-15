@@ -330,19 +330,28 @@ class ReserveCalcLogic:
         base_date = datetime.datetime.now().date() + datetime.timedelta(days=start_offset_days)
         all_days = util.DateUtil.get_ranges(base_date, self.__max_days)
         # filter actual days by available schedules
-        all_days = models.WeeklyScheduleModel.get_filtered_date_by_availalble_dayofweeks(all_days)
+        filtered_days = models.WeeklyScheduleModel.get_filtered_date_by_availalble_dayofweeks(all_days)
         # filter special holiday
-        all_days = models.SpecialHolydayModel.get_filtered_day(all_days)
-        for dt in all_days:
+        filtered_days = models.SpecialHolydayModel.get_filtered_day(filtered_days)
+        for dt in filtered_days:
             select_dates.append(dt)
 
         self.__select_dates = select_dates
+        # get difference as disabled days
+        self.__disabled_select_dates = util.ListUtil.list_difference(all_days, filtered_days)
+
         # select_date is setted without selectable at init, so if it is not match list, select again
         if (self.__select_date not in self.__select_dates) and (len(self.__select_dates) > 0):
             self.__select_date = self.__select_dates[0]
 
     def get_select_date(self):
         return self.__select_date
+
+    def get_disabled_select_date(self):
+        return self.__disabled_select_dates
+
+    def get_select_dates(self):
+        return self.__select_dates
 
     def get_select_dates_choices(self):
         # locale.setlocale(locale.LC_ALL, '')

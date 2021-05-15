@@ -1,4 +1,10 @@
-{% extends '../base.html' %} {% block header %} {% endblock header %}
+{% extends '../base.html' %} 
+{% block header %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.9/dist/flatpickr.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.9/dist/themes/dark.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.9/dist/flatpickr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.9/dist/l10n/ja.js"></script>
+{% endblock header %}
 {% block content %}
 <h2 class="title has-text-centered">予約入力</h2>
 
@@ -18,13 +24,25 @@
   </div>
 
   <div class="field">
+    {{ form.start_date.label_tag }}
+    <input type="text" name="start_date" class="input calendar" value="{{ form.start_date.value | safe }}"/>
+    {% if form.start_date.help_text %}
+    <span class="helptext">{{ form.start_date.help_text }}</span>
+    {% endif %} 
+    {% if form.start_date.error %}
+    <p class="help is-danger">{{ form.start_date.errors }}</p>
+    {% endif %}
+  </div>
+
+  {% comment %} <div class="field">
     {{ form.start_date.label_tag }} {{ form.start_date | add_class:'input' }} 
     {% if form.start_date.help_text %}
     <span class="helptext">{{ form.start_date.help_text }}</span>
     {% endif %} {% if form.start_date.error %}
     <p class="help is-danger">{{ form.start_date.errors }}</p>
     {% endif %}
-  </div>
+  </div> {% endcomment %}
+
 
   <div class="field">
     {{ form.selected_time.label_tag }}
@@ -235,8 +253,8 @@
     // set selection change event
     let number_text = document.getElementById("id_number");
     number_text.onchange = inputChange;
-    let date_text = document.getElementById("id_start_date");
-    date_text.onchange = inputChange;
+    // let date_text = document.getElementById("id_start_date");
+    // date_text.onchange = inputChange;
   }
 
   function initSelectedTimeRadioState() {
@@ -297,6 +315,28 @@
     }
   }
 
+  function initCalendar() {
+    $('input.calendar').flatpickr({
+       locale: "ja",
+       disableMobile: "true",
+       enable: {{ selectable_dates_json | safe }},
+       onChange: onSelectCalendar,
+       altInput: true,
+       altFormat: "Y-m-d (D)",
+       dateFormat: "Y-m-d",       
+    });
+  }
+
+  function onSelectCalendar(selectedDates, dateStr, instance) {
+    if (dateStr) {
+      const number = document.getElementById("id_number").value;
+      if (number && dateStr) {
+        saveInfo();
+        location.href = "/reserve/" + dateStr + "/" + number;
+      }
+    }
+  }
+
   window.onload = function () {
     loadInfo();
     initRadioEvent();
@@ -304,6 +344,7 @@
     initSeatMemo();
     initSelectedTimeRadioState();
     initValidationEvent();
+    initCalendar();
   };
 </script>
 

@@ -21,4 +21,7 @@ class ModelEncoder(json.JSONEncoder):
                 'updated_at': o.updated_at.astimezone(datetime.timezone(datetime.timedelta(hours=+9))).strftime('%Y-%m-%d %H:%M'),
                 'seat_name': o.seat.name
             }
+        elif isinstance(o, datetime.date):
+            return o.strftime('%Y-%m-%d')
+            
         return super(ModelEncoder, self).default(o)

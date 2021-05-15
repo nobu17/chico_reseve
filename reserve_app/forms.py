@@ -204,7 +204,13 @@ class ReserveForm(forms.Form):
         choices=RESERVATION_NUMBER
     )
 
-    start_date = forms.ChoiceField(
+    # start_date = forms.ChoiceField(
+    #     label='予約日',
+    #     required=True,
+    #     disabled=False,
+    # )
+
+    start_date = forms.DateField(
         label='予約日',
         required=True,
         disabled=False,
@@ -230,9 +236,8 @@ class ReserveForm(forms.Form):
         self.fields['tel'].initial = user.tel_number
         self.fields['email'].initial = user.get_email()
 
-    def init_field(self, number, select_date, select_dates, selected_times, selected_seats):
+    def init_field(self, number, select_date, selected_times, selected_seats):
         self.fields['number'].initial = number
-        self.fields['start_date'].choices = select_dates
         self.fields['start_date'].initial = select_date
         self.fields['selected_time'].choices = selected_times
         self.fields['selected_seat'].choices = selected_seats
