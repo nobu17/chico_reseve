@@ -23,5 +23,5 @@ class ModelEncoder(json.JSONEncoder):
             }
         elif isinstance(o, datetime.date):
             return o.strftime('%Y-%m-%d')
-            
+
         return super(ModelEncoder, self).default(o)

@@ -182,7 +182,7 @@ class SeatModel(models.Model):
     @classmethod
     def create_init_data(cls):
         SeatModel(name="カウンター席", memo="1人がけの席です。", capacity=1, minnum=1, count=6, max_count_of_one_reserve=6).save()
-        SeatModel(name="テーブル席", memo="２人がけの席です。", capacity=2, minnum=2, count=2, max_count_of_one_reserve=1).save()
+        SeatModel(name="テーブル席", memo="２人がけの席です。", capacity=2, minnum=2, count=2, max_count_of_one_reserve=2).save()
         SeatModel(name="テーブル席", memo="3~4人がけの席です。", capacity=4, minnum=3, count=1, max_count_of_one_reserve=1).save()
 
 
