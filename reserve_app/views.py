@@ -351,8 +351,9 @@ class AdminReserveCancel(generic.View):
         backurl = request.GET.get('backurl', '/user_admin/')
         form = self.form_class()
         form.load_for_cancl_admin(reserve_pk)
+        replace_dict = {"selected_seat": form.selected_seat_name}
 
-        return render(request, self.template_name, {'form': form, 'reserve_pk': reserve_pk, 'backurl': backurl})
+        return render(request, self.template_name, {'form': form, 'replace_dict': replace_dict, 'reserve_pk': reserve_pk, 'backurl': backurl})
 
     def post(self, request, *args, **kwargs):
         reserve_pk = self.kwargs.get('reserve_pk', '')
@@ -559,7 +560,8 @@ def reserve_cancel(request, reserve_pk=None):
             url = f'{redirect_url}?{parameters}'
             return redirect(url)
 
-    return render(request, 'reserves/cancel.html', {'form': form, 'reserve_pk': reserve_pk})
+    replace_dict = {"selected_seat": form.selected_seat_name}
+    return render(request, 'reserves/cancel.html', {'form': form, 'replace_dict': replace_dict, 'reserve_pk': reserve_pk})
 
 
 @ login_required
