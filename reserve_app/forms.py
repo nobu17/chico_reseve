@@ -1,10 +1,8 @@
 from django import forms
 from django.core.validators import RegexValidator, EmailValidator
-import datetime
 from . import models
 from . import exceptions
 from . import const
-from . import util
 from . import logics
 
 TELLNUMBER_REGEX = RegexValidator(regex=r'^[0-9]+$', message=("電話番号は数値のみ入力可能です。例：09012345678"))
@@ -106,27 +104,11 @@ class WeeklyScheduleModelForm(forms.ModelForm):
         start_time = self.cleaned_data['start_time']
         end_time = self.cleaned_data['end_time']
 
-        if start_time >= end_time:
-            raise forms.ValidationError("開始時刻は終了時刻より過去にする必要があります。")
+        check = logics.WeeklyScheduleCheck()
+        result = check.vlidate(self.instance.pk, start_time, end_time, dayofweek)
 
-        if end_time < (util.TimeUtil.add_minutes(start_time, const.RESERVE_MINUTES_OFFSET)):
-            raise forms.ValidationError(f'開始時刻と終了時刻の感覚が短すぎます。{const.RESERVE_MINUTES_OFFSET}分以上必要です。')
-
-        ranges = models.WeeklyScheduleModel.get_ranges(self.instance.pk, dayofweek, start_time, end_time)
-        if ranges.count() > 0:
-            raise forms.ValidationError("重複したスケジュールが存在します。")
-
-        # check reserve
-        # old schedule should not have reserve
-        now_date = datetime.datetime.now().date()
-        old = models.WeeklyScheduleModel.get(self.instance.pk)
-        if old is not None:
-            # python weeekday and model weekday is mismatch (+1 to adjust)
-            exists_reserves = models.ReserveModel.get_reserves_day_of_week(now_date, (old.dayofweek + 1), old.start_time, old.end_time)
-            # if exists reserves are not match new schedule, it is error
-            for reserve in exists_reserves:
-                if not util.DateTimeUtil.is_match(reserve.start_date, reserve.start_time, dayofweek, start_time, end_time):
-                    raise forms.ValidationError("変更するとこの予約が維持できません。" + util.DateTimeUtil.get_str(reserve.start_date, reserve.start_time))
+        if not result[0]:
+            raise forms.ValidationError(result[1])
 
         return self.cleaned_data
 

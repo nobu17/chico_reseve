@@ -32,6 +32,14 @@ class WeeklyScheduleCheck:
     """
 
     def is_reservation_exists(self, weekly_schedule_pk):
+        """check reservation is exists or not
+
+        Args:
+            weekly_schedule_pk ([int]): [weeklyschedule pk]
+
+        Returns:
+            [bool]: [reservation is exists or not]
+        """
         now_date = datetime.datetime.now().date()
         schedule = models.WeeklyScheduleModel.get(weekly_schedule_pk)
         if schedule is not None:
@@ -43,6 +51,42 @@ class WeeklyScheduleCheck:
                     return True
 
         return False
+
+    def vlidate(self, schedule_pk, start_time, end_time, day_of_week):
+        """is valid time or not
+
+        Args:
+            schedule_pk ([int]): [week schedule pk]
+            start_time ([time]): [start time]
+            end_time ([time]): [end time]
+            day_of_week ([int]): [day of week]
+
+        Returns:
+            [tuple(bool, string)]: [(time is valid),(error message)]
+        """
+        if start_time >= end_time:
+            return (False, "開始時刻は終了時刻より過去にする必要があります。")
+
+        if end_time < (util.TimeUtil.add_minutes(start_time, const.RESERVE_MINUTES_OFFSET)):
+            return (False, f'開始時刻と終了時刻の感覚が短すぎます。{const.RESERVE_MINUTES_OFFSET}分以上必要です。')
+
+        ranges = models.WeeklyScheduleModel.get_ranges(schedule_pk, day_of_week, start_time, end_time)
+        if ranges.count() > 0:
+            return (False, "重複したスケジュールが存在します。")
+
+        # check reserve
+        # old schedule should not have reserve
+        now_date = datetime.datetime.now().date()
+        old = models.WeeklyScheduleModel.get(schedule_pk)
+        if old is not None:
+            # python weeekday and model weekday is mismatch (+1 to adjust)
+            exists_reserves = models.ReserveModel.get_reserves_day_of_week(now_date, (old.dayofweek + 1), old.start_time, old.end_time)
+            # if exists reserves are not match new schedule, it is error
+            for reserve in exists_reserves:
+                if not util.DateTimeUtil.is_match(reserve.start_date, reserve.start_time, day_of_week, start_time, end_time):
+                    return (False, "変更するとこの予約が維持できません。" + util.DateTimeUtil.get_str(reserve.start_date, reserve.start_time))
+
+        return (True, "")
 
 
 class UserBanCheck:
