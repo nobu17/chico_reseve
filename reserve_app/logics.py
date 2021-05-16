@@ -4,7 +4,7 @@ from . import util
 import locale
 import datetime
 from django.db import connection
-from django.core.mail import send_mail, EmailMessage
+from django.core.mail import EmailMessage
 
 
 class ReserveDuplicateCheck:
@@ -25,6 +25,24 @@ class ReserveDuplicateCheck:
 
     def get_duplicated_error_message(self):
         return "既に予約済みです。同時に予約できるのは１件のみです。"
+
+
+class WeeklyScheduleCheck:
+    """This class is responsible for checking weekly schedule
+    """
+
+    def is_reservation_exists(self, weekly_schedule_pk):
+        now_date = datetime.datetime.now().date()
+        schedule = models.WeeklyScheduleModel.get(weekly_schedule_pk)
+        if schedule is not None:
+            # python weeekday and model weekday is mismatch (+1 to adjust)
+            exists_reserves = models.ReserveModel.get_reserves_day_of_week(now_date, (schedule.dayofweek + 1), schedule.start_time, schedule.end_time)
+            # if exists reserves are not match new schedule, it is error
+            for reserve in exists_reserves:
+                if util.DateTimeUtil.is_match(reserve.start_date, reserve.start_time, schedule.dayofweek, schedule.start_time, schedule.end_time):
+                    return True
+
+        return False
 
 
 class UserBanCheck:

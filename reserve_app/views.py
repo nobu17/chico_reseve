@@ -17,6 +17,8 @@ from . import logics
 from . import encode
 import datetime
 import json
+from django.core.exceptions import ValidationError
+from django.http import HttpResponseRedirect
 # import pytz
 # Create your views here.
 
@@ -236,6 +238,15 @@ class ScheduleDelete(generic.DeleteView):
     template_name = "schedules/delete.html"
     model = models.WeeklyScheduleModel
     success_url = reverse_lazy('schedules_list')
+
+    def delete(self, request, *args, **kwargs):
+        target = self.get_object()
+        check = logics.WeeklyScheduleCheck()
+        if check.is_reservation_exists(target.pk):
+            messages.error(self.request, "指定時間に予約が存在するので削除できません。", extra_tags='danger')
+            return HttpResponseRedirect(self.success_url)
+
+        return(super().delete(request, *args, **kwargs))
 
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
