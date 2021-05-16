@@ -17,7 +17,6 @@ from . import logics
 from . import encode
 import datetime
 import json
-from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect
 # import pytz
 # Create your views here.
