@@ -42,6 +42,10 @@ class TimeUtil:
         return results
 
     @staticmethod
+    def is_range(start_time, end_time, target_start_time, target_end_time):
+        return start_time < target_end_time and end_time > target_start_time
+
+    @staticmethod
     def add_minutes(time, minutes):
         tempDate = datetime.date.today()
         basetime = datetime.time(time.hour, time.minute, 00)

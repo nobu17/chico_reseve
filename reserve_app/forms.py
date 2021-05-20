@@ -113,6 +113,40 @@ class WeeklyScheduleModelForm(forms.ModelForm):
         return self.cleaned_data
 
 
+class SpecialScheduleModelForm(forms.ModelForm):
+    field_order = ['start_date', 'start_time', 'end_time']
+
+    class Meta:
+        model = models.SpecialScheduleModel
+        fields = {'start_date', 'start_time', 'end_time'}
+        labels = {
+            'start_time': '開始時刻',
+            'end_time': '終了時刻'
+        }
+
+    start_date = forms.DateField(
+        label="開始日",
+        widget=forms.DateInput(attrs={"type": "date"})
+    )
+
+    def clean(self):
+        start_date = self.cleaned_data['start_date']
+        start_time = self.cleaned_data['start_time']
+        end_time = self.cleaned_data['end_time']
+
+        check = logics.SpecialScheduleCheck()
+        result = check.validate(start_date, start_time, end_time)
+        if not result[0]:
+            raise forms.ValidationError(result[1])
+
+        return self.cleaned_data
+
+    def can_add_data(self):
+        # check max
+        count = models.SpecialScheduleModel.get_count()
+        return count < const.MAX_SPECIAL_SCHEDULE_COUNT
+
+
 class SeatModelForm(forms.ModelForm):
     field_order = ['name', 'memo', 'count', 'capacity', 'minnum', 'max_count_of_one_reserve']
 

@@ -1,0 +1,33 @@
+{% extends '../base.html' %} {% block header %} {% endblock header %} 
+{% block content %}
+<h2 class="title has-text-centered">特別営業時間管理</h2>
+<p class="has-text-centered has-text-danger">※現在の予約内容と矛盾する変更はできません。</p>
+<p class="has-text-centered has-text-danger">※前日までの予定はいつでも削除可能。(データ数は最大10)</p>
+<table class="table has-text-centered is-fullwidth">
+  <tr>
+    <th>日時</th>
+    <th>開始時刻</th>
+    <th>終了時刻</th>
+    <th></th>
+  </tr>
+  {% for schedule in object_list %}
+  <tr>
+    <td>{{ schedule.start_date }}</td>
+    <td>{{ schedule.start_time }}</td>
+    <td>{{ schedule.end_time }}</td>
+    <td><a class="button is-danger" href="{% url 'special_schedules_delete' schedule.pk %}">削除</a></td>
+  </tr>
+  {% endfor %}
+</table>
+
+
+<div class="columns">
+  <div class="column is-6">
+    <a class="button is-info is-fullwidth" href="{% url 'special_schedules_create' %}">新規作成</a>
+  </div>
+  <div class="column is-6">
+    <a class="button is-danger is-fullwidth" href="{% url 'user_admin' %}">戻る</a>
+  </div>
+</div>
+
+{% endblock content %}

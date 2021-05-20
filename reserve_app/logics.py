@@ -89,6 +89,66 @@ class WeeklyScheduleCheck:
         return (True, "")
 
 
+class SpecialScheduleCheck:
+    """This class is responsible for checking special schedule
+    """
+
+    def is_reservation_exists(self, special_schedule_pk):
+        """check reservation is exists or not
+
+        Args:
+            special_schedule_pk ([int]): [special_schedule_pk pk]
+
+        Returns:
+            [bool]: [reservation is exists or not]
+        """
+        schedule = models.SpecialScheduleModel.get(special_schedule_pk)
+
+        if schedule is not None:
+            # if schedule is past, not check anything
+            if schedule.start_date < datetime.datetime.now().date():
+                return False
+
+            exists_reserves = models.ReserveModel.get_by_date(schedule.start_date)
+            for reserve in exists_reserves:
+                reserve_end_time = reserve.start_time + datetime.timedelta(minutes=const.RESERVE_MINUTES_OFFSET)
+                if util.TimeUtil.is_range(schedule.start_time, schedule.end_time, reserve.start_time, reserve_end_time):
+                    return True
+
+        return False
+
+    def validate(self, start_date, start_time, end_time):
+        """is valid schedule or not
+
+        Args:
+            start_date ([date]): [start_date]
+            start_time ([time]): [start time]
+            end_time ([time]): [end time]
+
+        Returns:
+            [tuple(bool, string)]: [(time is valid),(error message)]
+        """
+        now_date = datetime.datetime.now().date()
+        if now_date >= start_date:
+            return (False, "開始日付は明日以降のみ指定可能です。")
+
+        if start_time >= end_time:
+            return (False, "開始時刻は終了時刻より過去にする必要があります。")
+
+        if end_time < (util.TimeUtil.add_minutes(start_time, const.RESERVE_MINUTES_OFFSET)):
+            return (False, f'開始時刻と終了時刻の感覚が短すぎます。{const.RESERVE_MINUTES_OFFSET}分以上必要です。')
+
+        ranges = models.WeeklyScheduleModel.get_ranges(-1, start_date.weekday(), start_time, end_time)
+        if ranges.count() > 0:
+            return (False, "通常予定に重複したスケジュールが存在します。")
+
+        ranges = models.SpecialScheduleModel.get_ranges(start_date, start_time, end_time)
+        if ranges.count() > 0:
+            return (False, "重複したスケジュールが存在します。")
+
+        return (True, "")
+
+
 class UserBanCheck:
     """This class is responsible for checking user banned or not
     """
@@ -350,6 +410,8 @@ class ReserveCalcLogic:
         all_days = util.DateUtil.get_ranges(base_date, self.__max_days)
         # filter actual days by available schedules
         filtered_days = models.WeeklyScheduleModel.get_filtered_date_by_availalble_dayofweeks(all_days)
+        # add special schedule
+        filtered_days = models.SpecialScheduleModel.add_lack_date(filtered_days, all_days[0], all_days[-1])
         # filter special holiday
         filtered_days = models.SpecialHolydayModel.get_filtered_day(filtered_days)
         for dt in filtered_days:
@@ -389,7 +451,12 @@ class ReserveCalcLogic:
         week_of_day = self.__select_date.weekday()
         self.__reserve_time_list = []
         # get available time schedules by selected date' dayofweek
-        schedules = models.WeeklyScheduleModel.get_by_dayofweek(week_of_day)
+        schedules = list(models.WeeklyScheduleModel.get_by_dayofweek(week_of_day))
+        # special schedules
+        specials = models.SpecialScheduleModel.get_by_date(self.__select_date)
+        for special in specials:
+            schedules.append(special)
+
         # divide the schedule by segument of time
         for schedule in schedules:
             # actual end_time is needed to concern offsets
@@ -398,6 +465,7 @@ class ReserveCalcLogic:
             for time_result in time_results:
                 self.__reserve_time_list.append(time_result)
                 # self.__reserve_time_list.append((time_result, time_result.strftime('%H:%M')))
+        self.__reserve_time_list.sort()
 
     def get_reserve_time_list_choices(self):
         """

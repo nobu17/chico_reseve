@@ -93,7 +93,7 @@ class WeeklyScheduleModel(models.Model):
 
     @classmethod
     def get_ranges(cls, pk, dayofweek, start_time, end_time):
-        return WeeklyScheduleModel.objects.filter(dayofweek=dayofweek, start_time__gte=start_time, end_time__lte=end_time).exclude(pk=pk)
+        return WeeklyScheduleModel.objects.filter(dayofweek=dayofweek, start_time__lt=end_time, end_time__gt=start_time).exclude(pk=pk)
 
     @classmethod
     def get_by_dayofweek(cls, dayofweek):
@@ -125,6 +125,49 @@ class WeeklyScheduleModel(models.Model):
         WeeklyScheduleModel(dayofweek=SATUR_DAY, start_time=datetime.time(7, 00, 00), end_time=datetime.time(9, 30, 00)).save()
         WeeklyScheduleModel(dayofweek=SATUR_DAY, start_time=datetime.time(11, 30, 00), end_time=datetime.time(15, 00, 00)).save()
         WeeklyScheduleModel(dayofweek=SATUR_DAY, start_time=datetime.time(17, 30, 00), end_time=datetime.time(21, 00, 00)).save()
+
+
+class SpecialScheduleModel(models.Model):
+    start_date = models.DateField()
+    start_time = models.TimeField(choices=TIME_MAP_HALF_HOURS_CHOICES)
+    end_time = models.TimeField(choices=TIME_MAP_HALF_HOURS_CHOICES)
+
+    @classmethod
+    def get(cls, pk):
+        return SpecialScheduleModel.objects.filter(pk=pk).first()
+
+    @classmethod
+    def get_all(cls):
+        return SpecialScheduleModel.objects.order_by('-start_date', 'start_time')
+
+    @classmethod
+    def get_count(cls):
+        return SpecialScheduleModel.objects.count()
+
+    @classmethod
+    def get_by_date(cls, start_date):
+        return SpecialScheduleModel.objects.filter(start_date=start_date).order_by('start_date', 'start_time')
+
+    @classmethod
+    def get_ranges(cls, start_date, start_time, end_time):
+        return SpecialScheduleModel.objects.filter(start_date=start_date, start_time__lt=end_time, end_time__gt=start_time)
+
+    @classmethod
+    def get_ranges_by_date(cls, start_date, end_date):
+        return SpecialScheduleModel.objects.filter(start_date__lte=end_date, start_date__gte=start_date)
+
+    @classmethod
+    def add_lack_date(cls, all_days, start_date, end_date):
+        # get ranges
+        all_special_days = SpecialScheduleModel.get_ranges_by_date(start_date, end_date)
+        # get union
+        unique = []
+        for special_day in all_special_days:
+            if special_day.start_date not in all_days:
+                unique.append(special_day.start_date)
+
+        all_days.extend(unique)
+        return all_days
 
 
 class SpecialHolydayModel(models.Model):

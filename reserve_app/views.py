@@ -250,6 +250,56 @@ class ScheduleDelete(generic.DeleteView):
 
 @method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
 @method_decorator(staff_member_required(login_url="/"), name="dispatch")
+class SpecialScheduleList(generic.ListView):
+    template_name = "special_schedules/index.html"
+    queryset = models.SpecialScheduleModel.get_all()
+
+
+@method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
+class SpecialScheduleCreate(generic.CreateView):
+    template_name = "special_schedules/create.html"
+    model = models.SpecialScheduleModel
+    form_class = forms.SpecialScheduleModelForm
+    success_url = reverse_lazy('special_schedules_list')
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.form_class().can_add_data():
+            messages.error(self.request, "最大の作成数に達しました。先に削除を行ってから追加してください。", extra_tags='danger')
+            return redirect("special_schedules_list")
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['start_date'] = datetime.date.today()
+        return initial
+
+    def form_valid(self, form):
+        messages.success(self.request, "作成に成功しました。")
+        return super().form_valid(form)
+
+
+@method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
+class SpecialScheduleDelete(generic.DeleteView):
+    template_name = "special_schedules/delete.html"
+    model = models.SpecialScheduleModel
+    success_url = reverse_lazy('special_schedules_list')
+
+    def delete(self, request, *args, **kwargs):
+        target = self.get_object()
+        check = logics.SpecialScheduleCheck()
+        if check.is_reservation_exists(target.pk):
+            messages.error(self.request, "指定時間に予約が存在するので削除できません。", extra_tags='danger')
+            return HttpResponseRedirect(self.success_url)
+
+        messages.success(self.request, "削除に成功しました。")
+        return(super().delete(request, *args, **kwargs))
+
+
+@method_decorator(login_required(login_url="/accounts/admin_login/"), name="dispatch")
+@method_decorator(staff_member_required(login_url="/"), name="dispatch")
 class AdminReserveUserSumList(generic.ListView):
     template_name = "useradmin/reserve_user_sum_list.html"
     paginate_by = 100

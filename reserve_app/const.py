@@ -1,6 +1,7 @@
 
 # availalble data count of creating holyday setting
 MAX_HOLIDAY_COUNT = 10
+MAX_SPECIAL_SCHEDULE_COUNT = 10
 
 MAX_RESERVE_NUMBER_OF_CUSTOMER = 6
 
