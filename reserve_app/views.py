@@ -272,7 +272,7 @@ class SpecialScheduleCreate(generic.CreateView):
 
     def get_initial(self):
         initial = super().get_initial()
-        initial['start_date'] = datetime.date.today()
+        initial['start_date'] = datetime.date.today() + datetime.timedelta(days=1)
         return initial
 
     def form_valid(self, form):
