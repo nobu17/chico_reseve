@@ -111,7 +111,7 @@ class SpecialScheduleCheck:
 
             exists_reserves = models.ReserveModel.get_by_date(schedule.start_date)
             for reserve in exists_reserves:
-                reserve_end_time = reserve.start_time + datetime.timedelta(minutes=const.RESERVE_MINUTES_OFFSET)
+                reserve_end_time = util.TimeUtil.add_minutes(reserve.start_time, const.RESERVE_MINUTES_OFFSET)
                 if util.TimeUtil.is_range(schedule.start_time, schedule.end_time, reserve.start_time, reserve_end_time):
                     return True
 
