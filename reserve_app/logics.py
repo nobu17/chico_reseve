@@ -136,11 +136,11 @@ class SpecialScheduleCheck:
             return (False, "開始時刻は終了時刻より過去にする必要があります。")
 
         if end_time < (util.TimeUtil.add_minutes(start_time, const.RESERVE_MINUTES_OFFSET)):
-            return (False, f'開始時刻と終了時刻の感覚が短すぎます。{const.RESERVE_MINUTES_OFFSET}分以上必要です。')
+            return (False, f'開始時刻と終了時刻の間隔が短すぎます。{const.RESERVE_MINUTES_OFFSET}分以上必要です。')
 
-        ranges = models.WeeklyScheduleModel.get_ranges(-1, start_date.weekday(), start_time, end_time)
-        if ranges.count() > 0:
-            return (False, "通常予定に重複したスケジュールが存在します。")
+        # ranges = models.WeeklyScheduleModel.get_ranges(-1, start_date.weekday(), start_time, end_time)
+        # if ranges.count() > 0:
+        #     return (False, "通常予定に重複したスケジュールが存在します。")
 
         ranges = models.SpecialScheduleModel.get_ranges(start_date, start_time, end_time)
         if ranges.count() > 0:
@@ -450,12 +450,17 @@ class ReserveCalcLogic:
         # week_of_day = 1
         week_of_day = self.__select_date.weekday()
         self.__reserve_time_list = []
-        # get available time schedules by selected date' dayofweek
-        schedules = list(models.WeeklyScheduleModel.get_by_dayofweek(week_of_day))
         # special schedules
         specials = models.SpecialScheduleModel.get_by_date(self.__select_date)
-        for special in specials:
-            schedules.append(special)
+        # if exists special holuday, ignore existing weekly schedule
+        if len(specials) > 0:
+            schedules = specials
+        else:
+            # get available time schedules by selected date' dayofweek
+            schedules = list(models.WeeklyScheduleModel.get_by_dayofweek(week_of_day))
+
+        # for special in specials:
+        #    schedules.append(special)
 
         # divide the schedule by segument of time
         for schedule in schedules:

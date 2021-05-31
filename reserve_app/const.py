@@ -9,7 +9,7 @@ DEFAULT_RESERVE_NUMBER_OF_CUSTOMER = 1
 
 DURATION_MINUTES_OF_RESERVE = 30
 
-OFFSET_DAYS_OF_RESERVE = 14
+OFFSET_DAYS_OF_RESERVE = 60
 
 # minutes of offset one reserve consume(start_time + this => end of this reserve time)
 RESERVE_MINUTES_OFFSET = 60
