@@ -323,9 +323,9 @@ class ReserveModel(models.Model):
     def get_user_current_reserve(cls, user_id):
         now = datetime.datetime.now()
         today_date = now.date()
-        # 10 minutes before form current is available reserve
-        offset_time = util.TimeUtil.sub_minutes(now.time(), 10)
-        return ReserveModel.objects.filter(user=user_id, canceled=False).filter(Q(start_date__gte=today_date) | Q(start_date=today_date, start_time__gte=offset_time))
+        # 30 minutes after form current is available reserve
+        offset_time = util.TimeUtil.sub_minutes(now.time(), 30)
+        return ReserveModel.objects.filter(user=user_id, canceled=False).filter(Q(start_date__gt=today_date) | Q(start_date=today_date, start_time__gte=offset_time))
 
     @classmethod
     def get_reserve_sum_by_user(cls):
