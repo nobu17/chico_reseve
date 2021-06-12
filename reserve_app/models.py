@@ -297,7 +297,7 @@ class ReserveModel(models.Model):
         now = datetime.datetime.now()
         today_date = now.date()
         offset_time = util.TimeUtil.sub_minutes(now.time(), 10)
-        return ReserveModel.objects.filter(user=user_id, canceled=False).filter(Q(start_date__gte=today_date) | Q(start_date=today_date, start_time__gte=offset_time)).exists()
+        return ReserveModel.objects.filter(user=user_id, canceled=False).filter(Q(start_date__gt=today_date) | Q(start_date=today_date, start_time__gte=offset_time)).exists()
 
     @classmethod
     def exists_user_availalbe_reserve(cls, user_id, reserve_pk):
@@ -305,7 +305,7 @@ class ReserveModel(models.Model):
         today_date = now.date()
         # 30 minutes before is available reserve
         offset_time = util.TimeUtil.sub_minutes(now.time(), 30)
-        return ReserveModel.objects.filter(pk=reserve_pk, user=user_id, canceled=False).filter(Q(start_date__gte=today_date) | Q(start_date=today_date, start_time__gte=offset_time)).exists()
+        return ReserveModel.objects.filter(pk=reserve_pk, user=user_id, canceled=False).filter(Q(start_date__gt=today_date) | Q(start_date=today_date, start_time__gte=offset_time)).exists()
 
     @classmethod
     def exists_reserve(cls, start_date, end_date):
