@@ -324,6 +324,8 @@ class SendEmail:
         message += f"{reserve_model.number} 名\n\n"
         message += "○席\n"
         message += f"{reserve_model.seat.name}\n\n"
+        message += "○代表者ご氏名\n"
+        message += f"{reserve_model.full_name}\n\n"
         message += "○メモ等確認事項\n"
         message += f"{reserve_model.memo}\n\n"
         return message
