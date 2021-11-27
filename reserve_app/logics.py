@@ -573,8 +573,8 @@ class SeatRemainInformation:
     def decrease_seat_remain(self, reserve_data):
         # define end time form reservation start time
         reserve_end_time = util.TimeUtil.add_minutes(reserve_data.start_time, const.RESERVE_MINUTES_OFFSET)
-        # if reservation is match the time, decreasing the specified seat number
-        if self.start_time >= reserve_data.start_time and reserve_end_time >= self.end_time:
+        # if reservation is match the time, decreasing the specified seat number(ex:reserve:10:00 ~ 11:00, right 3 time blocks are decreasing (9:30 ~ 10:00,10:00~10:30,10:30~11:00)
+        if reserve_data.start_time <= self.end_time and self.start_time < reserve_end_time:
             self.seat_remains[reserve_data.seat.pk]['seat_count'] -= reserve_data.seat_used_number
 
     def set_state_by_reserve_number(self, reserve_number):
