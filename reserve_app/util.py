@@ -1,6 +1,7 @@
 import datetime
 import calendar
 import locale
+import uuid
 from dateutil.relativedelta import relativedelta
 
 
@@ -173,3 +174,23 @@ class ListUtil:
                 result.remove(value)
 
         return result
+
+
+class SessionUtil:
+    @staticmethod
+    def set_submit_token(request):
+        submit_token = str(uuid.uuid4())
+        request.session['submit_token'] = submit_token
+        return submit_token
+
+    @staticmethod
+    def exists_submit_token(request):
+        token_in_request = request.POST.get('submit_token')
+        token_in_session = request.session.pop('submit_token', '')
+
+        if not token_in_request:
+            return False
+        if not token_in_session:
+            return False
+
+        return token_in_request == token_in_session

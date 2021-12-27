@@ -20,6 +20,7 @@
             <a class="button is-danger" href="/reserve/{{ form.start_date.value }}/{{ form.number.value }}">キャンセル</a>
         </p>
     </div>
+    <input type="hidden" name="submit_token" value="{{ submit_token }}" />
 </form>
 
 {% endblock content %}

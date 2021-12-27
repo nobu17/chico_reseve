@@ -518,7 +518,8 @@ def reserve_new(request, select_date=None, number=None):
         # print(form)
         if form.is_valid():
             replace_dict = {"selected_seat": form.get_selected_seat_display()}
-            return render(request, 'reserves/confirm.html', {'form': form, 'replace_dict': replace_dict})
+            submit_token = util.SessionUtil.set_submit_token(request)
+            return render(request, 'reserves/confirm.html', {'form': form, 'replace_dict': replace_dict, 'submit_token': submit_token, })
         else:
             print(form.errors)
             errors = form.errors
@@ -547,6 +548,12 @@ def reserve_new(request, select_date=None, number=None):
 @ login_required
 def create_new(request):
     if request.method == "POST":
+        if not util.SessionUtil.exists_submit_token(request):
+            redirect_url = reverse_lazy('my_page')
+            parameters = urlencode({'user_message': "2重送信エラーが発生しました。お手数ですが現在の予約状況をご確認ください。問題がある場合、お手数ですがコンタクトページからご連絡ください。"})
+            url = f'{redirect_url}?{parameters}'
+            return redirect(url)
+
         form = forms.ReserveConfirmForm(request.POST)
         if form.is_valid():
             select_date = form.cleaned_data['start_date']
@@ -575,7 +582,7 @@ def create_new(request):
             print(form.errors)
 
     redirect_url = reverse_lazy('reserve')
-    return redirect(url)
+    return redirect(redirect_url)
 
 
 @ login_required
