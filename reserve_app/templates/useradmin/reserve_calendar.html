@@ -1,6 +1,7 @@
 {% extends '../base.html' %} {% block header %} {% endblock header %} 
 {% block content %}
 <h2 class="title has-text-centered">カレンダー</h2>
+<p class="has-text-centered has-text-danger">※通常スケジュールで有効でない曜日の予約は選択しても見る事ができません。予約一覧から確認してください。</p>
 <a class="button is-danger" href="{% url 'user_admin' %}">戻る</a>
 
 <div class="cal_container" style="width:100%;">

@@ -109,7 +109,7 @@ class SpecialScheduleCheck:
             if schedule.start_date < datetime.datetime.now().date():
                 return False
 
-            exists_reserves = models.ReserveModel.get_by_date(schedule.start_date)
+            exists_reserves = models.ReserveModel.get_available_by_date(schedule.start_date)
             for reserve in exists_reserves:
                 reserve_end_time = util.TimeUtil.add_minutes(reserve.start_time, const.RESERVE_MINUTES_OFFSET)
                 if util.TimeUtil.is_range(schedule.start_time, schedule.end_time, reserve.start_time, reserve_end_time):
@@ -521,7 +521,7 @@ class ReserveCalcLogic:
         self.print_test()
 
         # get reserves and calc reamin seat number
-        reserves = models.ReserveModel.get_by_date(self.__select_date)
+        reserves = models.ReserveModel.get_available_by_date(self.__select_date)
         for reserve in reserves:
             for remain in self.__seat_remain_info:
                 # decreasing seat count if match the time
